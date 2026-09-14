@@ -41,7 +41,7 @@ https://github.com/blackmatrix7/ios_rule_script/tree/master/rule
 
 - 规则同步
 - 规则整理
-- MRS 格式转换
+- 将一些大型的规则集进行 MRS 格式转换
 
 # 二、仓库目录
 
