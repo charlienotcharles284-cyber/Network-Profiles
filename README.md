@@ -144,7 +144,9 @@ ChinaMax
 
 ---
 
-## 2. Advertising
+## 2. Advertising(大型综合规则集）
+
+‼️使用这一套规则后，无需再使用AdvertisingLite系列和Privacy系列
 
 Advertising 需要同时使用：
 
@@ -162,7 +164,7 @@ Advertising
 
 ## 3. AdvertisingLite
 
-‼️**这是上一个2. Advertising组合的精简版，不要与上一个一起使用**‼️
+‼️**这是上一个 Advertising（大型综合规则集）的精简版，不要与上一个一起使用**‼️
 
 AdvertisingLite 需要同时使用：
 
@@ -179,6 +181,9 @@ AdvertisingLite
 ---
 
 ## 4. Privacy
+
+‼️ 第2套的Advertising规则以包含两个Privacy规则！
+‼️ 如果你使用了第2套的 Advertising(大型综合规则集） 无需重复使用！
 
 Privacy 需要同时使用：
 
@@ -224,7 +229,7 @@ ChinaMax
 Advertising
 ├── Rules/Advertising.yaml
 └── MRS/Advertising_Domain.mrs
-
+（如果使用了这个，就不需要使用下面的AdvertisingLite系列和Privacy系列）
 
 AdvertisingLite
 ├── Rules/AdvertisingLite.yaml
