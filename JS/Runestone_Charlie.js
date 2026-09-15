@@ -383,9 +383,26 @@ function main(config) {
   ];
 
   regionGroups.push(
-    {key: "MY", name: "🇲🇾 MY", filter: /(🇲🇾|马来西亚|馬來西亞|吉隆坡|Malaysia|Kuala[ _-]?Lumpur|(?:^|[^a-z0-9])MY(?:$|[^a-z0-9])|^MY[0-9])/i},
-    {key: "AU", name: "🇦🇺 AU", filter: /(🇦🇺|澳大利亚|澳大利亞|澳洲|悉尼|墨尔本|墨爾本|Australia|Sydney|Melbourne|(?:^|[^a-z0-9])AU(?:$|[^a-z0-9])|^AU[0-9])/i},
-    {key: "IN", name: "🇮🇳 IN", filter: /(🇮🇳|印度|孟买|孟買|新德里|India|Mumbai|New[ _-]?Delhi|(?:^|[^a-z0-9])IN(?:$|[^a-z0-9])|^IN[0-9])/i}
+    {
+      key: "MY",
+      name: "🇲🇾 MY",
+      filter: /(🇲🇾|马来西亚|馬來西亞|吉隆坡|Malaysia|Kuala[ _-]?Lumpur|(?:^|[^a-z0-9])MY(?:$|[^a-z0-9])|^MY[0-9])/i,
+      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Malaysia.png"
+    },
+
+    {
+      key: "AU",
+      name: "🇦🇺 AU",
+      filter: /(🇦🇺|澳大利亚|澳大利亞|澳洲|悉尼|墨尔本|墨爾本|Australia|Sydney|Melbourne|(?:^|[^a-z0-9])AU(?:$|[^a-z0-9])|^AU[0-9])/i,
+      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Australia.png"
+    },
+
+    {
+      key: "IN",
+      name: "🇮🇳 IN",
+      filter: /(🇮🇳|印度|孟买|孟買|新德里|India|Mumbai|New[ _-]?Delhi|(?:^|[^a-z0-9])IN(?:$|[^a-z0-9])|^IN[0-9])/i,
+      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/India.png"
+    }
   );
 
   const existingRegionalAutos = [];
