@@ -61,7 +61,11 @@ for(const file of files){
  });
  test(file+' explicit services precede final catch-all',()=>{
   const c=run(file,{proxies:nodes(['日本'])}); validate(c);
-  for(const [domain,group] of [['pixiv.net','Pixiv'],['pximg.net','Pixiv'],['linkedin.com','LinkedIn'],['licdn.com','LinkedIn'],['threads.net','Threads'],['threads.com','Threads']]) assert.ok(c.rules.includes(`DOMAIN-SUFFIX,${domain},${group}`));
+  for (const name of ['Pixiv', 'LinkedIn', 'Threads']) {
+   assert.ok(c.rules.includes(`RULE-SET,${name}_Domain,${name}`));
+   assert.equal(c['rule-providers'][name + '_Domain'].interval, 86400);
+   assert.equal(c['rule-providers'][name + '_Domain'].behavior, 'domain');
+  }
   assert.ok(!c.rules.some(r=>/DOMAIN-KEYWORD,(google|copilot|grok),/.test(r)));
  });
 }

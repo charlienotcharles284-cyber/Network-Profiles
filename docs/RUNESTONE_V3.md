@@ -51,3 +51,18 @@ URL 导入保存的是脚本文本快照。更新 JS 后需要重新导入；rul
 - https://github.com/TokenPLS/Hako
 - https://github.com/Sydney-Moses/Network-Profiles
 - https://github.com/blackmatrix7/ios_rule_script
+
+## Pixiv / LinkedIn / Threads 每日更新
+
+这三个服务已迁移到 `MRS/Pixiv_Domain.mrs`、`MRS/LinkedIn_Domain.mrs`、`MRS/Threads_Domain.mrs`。
+
+- GitHub Actions 沿用每天 UTC 00:00（北京时间 08:00）的计划任务；平台调度可能延迟。
+- 上游为 blackmatrix7/ios_rule_script 的对应 Clash YAML。转换保留 DOMAIN 精确匹配和 DOMAIN-SUFFIX 后缀匹配的区别。
+- 本地补充在 `Rules/service-additions.json`，目前保留上游尚未包含的 threads.com。
+- 输出同时保留可读的 `Rules/*_Domain.yaml`；脚本只加载 MRS，不重复加载这份 YAML。
+- 三份源全部通过校验和转换后才替换产物；空源、不支持的规则类型或转换失败会终止工作流，不提交部分更新。
+- 覆写脚本的远程规则集刷新间隔为 86400 秒。此次迁移需重新导入 JS 一次，以后这三个服务的域名数据更新无需再导入 JS。
+- 分组、图标、地区默认顺序和其他写在 JS 中的服务域名仍需重新导入 JS 更新。
+- Pixiv 上游还包括 Booth、Fanbox 等关联域名；LinkedIn 上游也含地区域名及服务资源，范围比旧版手写列表更完整。
+
+维护命令：`python scripts/sync-services.py --mihomo /path/to/mihomo`（依赖 PyYAML 6.0.2 和 Mihomo v1.19.30）。
