@@ -881,8 +881,16 @@ function main(config) {
     Threads: ["threads.net", "threads.com"]
   };
   const choices = ["🇯🇵 JP-Auto", "🇸🇬 SG-Auto", ...existingRegionalAutos, "🖥️ All-Nodes"];
+  const serviceIcons = {
+    Pixiv: "https://www.google.com/s2/favicons?domain=www.pixiv.net&sz=128",
+    LinkedIn: "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/linkedin.png",
+    Threads: "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/threads.png"
+  };
   const addedGroups = Object.keys(added).map(name => ({
-    name, type: "select", proxies: [...new Set(choices)].filter(n =>
+    name,
+    type: "select",
+    icon: serviceIcons[name],
+    proxies: [...new Set(choices)].filter(n =>
       n === "🖥️ All-Nodes" || existingRegionalAutos.includes(n))
   }));
   const afterSpeedtest = fixed["proxy-groups"].findIndex(g => g.name === "Speedtest") + 1;
