@@ -787,7 +787,7 @@ function main(config) {
       "behavior": "domain",
       "format": "mrs",
       "interval": 86400,
-      "url": "https://raw.githubusercontent.com/Sydney-Moses/Network-Profiles/refs/heads/main/MRS/Apple_Domain.mrs"
+      "url": "https://raw.githubusercontent.com/charlienotcharles284-cyber/Network-Profiles/refs/heads/main/MRS/Apple_Domain.mrs"
     },
     "AdvertisingLite": {
       "type": "http",
@@ -801,7 +801,7 @@ function main(config) {
       "behavior": "domain",
       "format": "mrs",
       "interval": 86400,
-      "url": "https://raw.githubusercontent.com/Sydney-Moses/Network-Profiles/refs/heads/main/MRS/AdvertisingLite_Domain.mrs"
+      "url": "https://raw.githubusercontent.com/charlienotcharles284-cyber/Network-Profiles/refs/heads/main/MRS/AdvertisingLite_Domain.mrs"
     },
     "Privacy": {
       "type": "http",
@@ -815,7 +815,7 @@ function main(config) {
       "behavior": "domain",
       "format": "mrs",
       "interval": 86400,
-      "url": "https://raw.githubusercontent.com/Sydney-Moses/Network-Profiles/refs/heads/main/MRS/Privacy_Domain.mrs"
+      "url": "https://raw.githubusercontent.com/charlienotcharles284-cyber/Network-Profiles/refs/heads/main/MRS/Privacy_Domain.mrs"
     },
     "ACL4SSR_BanAD": {
       "type": "http",
@@ -843,14 +843,14 @@ function main(config) {
       "behavior": "domain",
       "format": "mrs",
       "interval": 86400,
-      "url": "https://raw.githubusercontent.com/Sydney-Moses/Network-Profiles/refs/heads/main/MRS/ChinaMax_Domain.mrs"
+      "url": "https://raw.githubusercontent.com/charlienotcharles284-cyber/Network-Profiles/refs/heads/main/MRS/ChinaMax_Domain.mrs"
     },
     "ChinaMax_IP": {
       "type": "http",
       "behavior": "ipcidr",
       "format": "mrs",
       "interval": 86400,
-      "url": "https://raw.githubusercontent.com/Sydney-Moses/Network-Profiles/refs/heads/main/MRS/ChinaMax_IP.mrs"
+      "url": "https://raw.githubusercontent.com/charlienotcharles284-cyber/Network-Profiles/refs/heads/main/MRS/ChinaMax_IP.mrs"
     }
   }
   };

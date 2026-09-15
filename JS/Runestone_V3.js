@@ -1,17 +1,9 @@
-/*
- * 服务分类配置｜Hako 多机场合并版
- *
- * Hako 会将当前选中的多个节点来源合并到 config.proxies。
- * 本脚本不依赖任何 proxy-providers 名称。
- *
- * 结构：
- * 1. 主策略组
- * 2. 普通服务策略组
- * 3. 根据实际节点动态生成地区 Auto
- * 4. APNs-Fallback
- * 5. Rules
- * 6. Rule Providers
+/* Runestone V3 — routing-only Hako post-merge override.
+ * Import the raw JavaScript URL, save, and select it after node-source merging.
+ * Network settings and node objects are retained. Rules and groups are replaced.
+ * URL import is a snapshot: re-import to upgrade. See docs/RUNESTONE_V3.md.
  */
+const RUNESTONE = {repository: "charlienotcharles284-cyber/Network-Profiles", personal: false};
 
 function main(config) {
   // Hako 当前选中的所有机场节点都会合并到 config.proxies。
@@ -27,136 +19,22 @@ function main(config) {
     )
     .filter(Boolean);
 
-  const fixed = {
-    "mixed-port": 7890,
-    "allow-lan": false,
-    "bind-address": "*",
-    "mode": "rule",
-    "log-level": "info",
-    "external-controller": "127.0.0.1:9090",
-    "unified-delay": true,
-    "tcp-concurrent": true,
-    "ipv6": true,
-
-    "tun": {
-      "enable": true,
-      "stack": "gvisor",
-      "auto-route": true,
-      "auto-detect-interface": true,
-      "strict-route": true,
-      "dns-hijack": [
-        "any:53"
-      ]
-    },
-
-    "dns": {
-      "enable": true,
-      "respect-rules": true,
-      "ipv6": true,
-      "prefer-h3": false,
-      "enhanced-mode": "fake-ip",
-      "fake-ip-range": "198.18.0.1/16",
-
-      "default-nameserver": [
-        "223.5.5.5",
-        "119.29.29.29",
-        "2400:3200::1"
-      ],
-
-      "nameserver": [
-        "https://dns.cloudflare.com/dns-query",
-        "https://dns.google/dns-query"
-      ],
-
-      "proxy-server-nameserver-policy": null,
-
-      "proxy-server-nameserver": [
-        "https://dns.alidns.com/dns-query",
-        "https://doh.pub/dns-query"
-      ],
-
-      "direct-nameserver": [
-        "https://dns.alidns.com/dns-query",
-        "https://doh.pub/dns-query"
-      ],
-
-      "nameserver-policy": {
-        "dns.cloudflare.com": [
-          "1.1.1.1",
-          "1.0.0.1"
-        ],
-
-        "dns.google": [
-          "8.8.8.8",
-          "8.8.4.4"
-        ],
-
-        "dns.quad9.net": [
-          "9.9.9.9",
-          "149.112.112.112"
-        ],
-
-        "dns.alidns.com": [
-          "223.5.5.5",
-          "223.6.6.6"
-        ],
-
-        "doh.pub": [
-          "1.12.12.12",
-          "120.53.53.53"
-        ],
-
-        "geosite:cn": [
-          "https://dns.alidns.com/dns-query",
-          "https://doh.pub/dns-query"
-        ]
-      },
-
-      "fallback": [
-        "https://anycast.uncensoreddns.org/dns-query"
-      ],
-
-      "fallback-filter": {
-        "geoip": true,
-        "geoip-code": "CN",
-        "ipcidr": [
-          "240.0.0.0/4",
-          "127.0.0.0/8",
-          "0.0.0.0/32"
-        ]
-      },
-
-      "fake-ip-filter": [
-        "*.lan",
-        "*.local",
-        "localhost",
-        "*.msftconnecttest.com",
-        "*.msftncsi.com",
-        "*.msidentity.com",
-        "captive.apple.com",
-        "*.push.apple.com",
-        "stun.*",
-        "+.stun.*.*",
-        "+.stun.*.*.*",
-        "+.stun.*.*.*.*",
-        "+.stun.*.*.*.*.*",
-        "+.weixin.com",
-        "+.wechat.com",
-        "+.qq.com",
-        "+.tencent.com",
-        "speedtest.net"
-      ]
-    },
-
-    "profile": {
-      "store-selected": true,
-      "store-fake-ip": true
-    }
-  };
-
-  // ============================================================
-  // 节点池
-  // ============================================================
+  if (!config || typeof config !== "object" || Array.isArray(config)) {
+    throw new Error("Runestone: expected a configuration object");
+  }
+  if (!currentProxies.length) {
+    throw new Error("Runestone: no materialized nodes; select node sources and use the post-merge script stage");
+  }
+  if (currentProxies.some(p => !p || typeof p !== "object" || typeof p.name !== "string" || !p.name.trim())) {
+    throw new Error("Runestone: every node must be an object with a non-empty name");
+  }
+  if (new Set(currentProxyNames).size !== currentProxyNames.length) {
+    throw new Error("Runestone: duplicate node names; rename conflicting nodes in the source");
+  }
+  // Preserve client-owned networking and provider fields. Replace routing below.
+  const fixed = Object.assign({}, config);
+  fixed.mode = "rule";
+  fixed.profile = Object.assign({}, config.profile, {"store-selected": true});
 
   fixed.proxies = currentProxies;
   fixed["proxy-groups"] = [];
@@ -504,6 +382,12 @@ function main(config) {
     }
   ];
 
+  regionGroups.push(
+    {key: "MY", name: "🇲🇾 MY", filter: /(🇲🇾|马来西亚|馬來西亞|吉隆坡|Malaysia|Kuala[ _-]?Lumpur|(?:^|[^a-z0-9])MY(?:$|[^a-z0-9])|^MY[0-9])/i},
+    {key: "AU", name: "🇦🇺 AU", filter: /(🇦🇺|澳大利亚|澳大利亞|澳洲|悉尼|墨尔本|墨爾本|Australia|Sydney|Melbourne|(?:^|[^a-z0-9])AU(?:$|[^a-z0-9])|^AU[0-9])/i},
+    {key: "IN", name: "🇮🇳 IN", filter: /(🇮🇳|印度|孟买|孟買|新德里|India|Mumbai|New[ _-]?Delhi|(?:^|[^a-z0-9])IN(?:$|[^a-z0-9])|^IN[0-9])/i}
+  );
+
   const existingRegionalAutos = [];
 
   regionGroups.forEach(region => {
@@ -622,7 +506,7 @@ function main(config) {
   fixed["proxy-groups"].push({
     name: "APNs-Fallback",
     type: "fallback",
-    proxies: existingRegionalAutos,
+    proxies: existingRegionalAutos.length ? existingRegionalAutos : currentProxyNames.slice(),
     icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Apple.png",
     url: "http://captive.apple.com/hotspot-detect.html",
     interval: 300
@@ -792,15 +676,12 @@ function main(config) {
     "DOMAIN-SUFFIX,ai.microsoft.com,Copilot",
     "DOMAIN-SUFFIX,designer.microsoft.com,Copilot",
     "DOMAIN-SUFFIX,copilot.com,Copilot",
-    "DOMAIN-KEYWORD,copilot,Copilot",
 
     // Grok
     "DOMAIN-SUFFIX,grok.com,Grok",
     "DOMAIN-SUFFIX,x.ai,Grok",
-    "DOMAIN-KEYWORD,grok,Grok",
 
     // Google
-    "DOMAIN-KEYWORD,google,Google",
     "DOMAIN-SUFFIX,gmail.com,Google",
     "DOMAIN-SUFFIX,googleusercontent.com,Google",
     "DOMAIN-SUFFIX,gstatic.com,Google",
@@ -896,7 +777,7 @@ function main(config) {
       "behavior": "domain",
       "format": "mrs",
       "interval": 86400,
-      "url": "https://raw.githubusercontent.com/charlienotcharles284-cyber/Network-Profiles/refs/heads/main/MRS/Apple_Domain.mrs"
+      "url": "https://raw.githubusercontent.com/Sydney-Moses/Network-Profiles/refs/heads/main/MRS/Apple_Domain.mrs"
     },
 
     "AdvertisingLite": {
@@ -912,7 +793,7 @@ function main(config) {
       "behavior": "domain",
       "format": "mrs",
       "interval": 86400,
-      "url": "https://raw.githubusercontent.com/charlienotcharles284-cyber/Network-Profiles/refs/heads/main/MRS/AdvertisingLite_Domain.mrs"
+      "url": "https://raw.githubusercontent.com/Sydney-Moses/Network-Profiles/refs/heads/main/MRS/AdvertisingLite_Domain.mrs"
     },
 
     "Privacy": {
@@ -928,7 +809,7 @@ function main(config) {
       "behavior": "domain",
       "format": "mrs",
       "interval": 86400,
-      "url": "https://raw.githubusercontent.com/charlienotcharles284-cyber/Network-Profiles/refs/heads/main/MRS/Privacy_Domain.mrs"
+      "url": "https://raw.githubusercontent.com/Sydney-Moses/Network-Profiles/refs/heads/main/MRS/Privacy_Domain.mrs"
     },
 
     "ACL4SSR_BanAD": {
@@ -960,7 +841,7 @@ function main(config) {
       "behavior": "domain",
       "format": "mrs",
       "interval": 86400,
-      "url": "https://raw.githubusercontent.com/charlienotcharles284-cyber/Network-Profiles/refs/heads/main/MRS/ChinaMax_Domain.mrs"
+      "url": "https://raw.githubusercontent.com/Sydney-Moses/Network-Profiles/refs/heads/main/MRS/ChinaMax_Domain.mrs"
     },
 
     "ChinaMax_IP": {
@@ -968,9 +849,71 @@ function main(config) {
       "behavior": "ipcidr",
       "format": "mrs",
       "interval": 86400,
-      "url": "https://raw.githubusercontent.com/charlienotcharles284-cyber/Network-Profiles/refs/heads/main/MRS/ChinaMax_IP.mrs"
+      "url": "https://raw.githubusercontent.com/Sydney-Moses/Network-Profiles/refs/heads/main/MRS/ChinaMax_IP.mrs"
     }
   };
 
+  // All project-owned MRS resources follow one configurable repository.
+  Object.values(fixed["rule-providers"]).forEach(provider => {
+    provider.url = provider.url.replace("Sydney-Moses/Network-Profiles", RUNESTONE.repository);
+  });
+  fixed.rules = [...new Set(fixed.rules)];
+  const added = {
+    Pixiv: ["pixiv.net", "pximg.net"],
+    LinkedIn: ["linkedin.com", "licdn.com", "lnkd.in"],
+    Threads: ["threads.net", "threads.com"]
+  };
+  const choices = ["🇯🇵 JP-Auto", "🇸🇬 SG-Auto", ...existingRegionalAutos, "🖥️ All-Nodes"];
+  Object.keys(added).forEach(name => {
+    fixed["proxy-groups"].push({name, type: "select", proxies: [...new Set(choices)].filter(n =>
+      n === "🖥️ All-Nodes" || existingRegionalAutos.includes(n))});
+  });
+  const beforeServices = fixed.rules.findIndex(r => r === "DOMAIN-SUFFIX,youtube.com,YouTube");
+  fixed.rules.splice(beforeServices, 0, ...Object.entries(added).flatMap(([name, domains]) =>
+    domains.map(domain => "DOMAIN-SUFFIX," + domain + "," + name)));
+
+  // Explicit manual groups permit a stable IP within a chosen region.
+  regionGroups.forEach(region => {
+    const members = currentProxyNames.filter(name => region.filter.test(name));
+    if (members.length) fixed["proxy-groups"].push({name: region.name + "-Manual", type: "select", proxies: members});
+  });
+  const groups = fixed["proxy-groups"];
+  const manualNames = groups.filter(g => /-Manual$/.test(g.name)).map(g => g.name);
+  groups.filter(g => g.type === "select" && !/-Manual$/.test(g.name) && g.name !== "🖥️ All-Nodes")
+    .forEach(g => { g.proxies = [...new Set([...g.proxies, ...manualNames])]; });
+  const available = new Set(groups.map(g => g.name));
+  const regions = {JP: "🇯🇵 JP", SG: "🇸🇬 SG", HK: "🇭🇰 HK", TW: "🇹🇼 TW", US: "🇺🇸 US", UK: "🇬🇧 UK", MY: "🇲🇾 MY", AU: "🇦🇺 AU", IN: "🇮🇳 IN"};
+  const order = {
+    "PROXY-Gate": ["SG", "JP", "HK"], YouTube: ["JP", "MY", "TW", "SG", "US"],
+    Spotify: ["MY", "IN", "JP", "US"], GPT: ["JP", "SG", "TW", "US"],
+    Claude: ["JP", "SG", "TW", "US"], Gemini: ["JP", "SG", "TW", "US"],
+    Google: ["JP", "SG", "HK"], Github: ["JP", "SG", "HK", "US"],
+    X: ["JP", "TW", "SG"], Pixiv: ["JP", "TW", "SG"],
+    Facebook: ["SG", "JP", "US"], Instagram: ["SG", "JP", "US"], Threads: ["SG", "JP", "US"],
+    WhatsApp: ["SG", "JP", "HK"], Telegram: ["SG", "JP", "HK"], LinkedIn: ["SG", "US", "UK"]
+  };
+  if (RUNESTONE.personal) {
+    groups.push({name: "Meta-Region", type: "select", proxies: ["SG", "JP", "US"].map(k => regions[k] + "-Manual").filter(n => available.has(n)).concat("🖥️ All-Nodes")});
+    groups.forEach(group => {
+      if (order[group.name]) {
+        const stable = ["GPT", "Claude", "Gemini", "Google", "Spotify", "Facebook", "Instagram", "Threads"].includes(group.name);
+        const preferred = order[group.name].map(k => regions[k] + (stable ? "-Manual" : "-Auto")).filter(n => available.has(n));
+        group.proxies = [...new Set([...preferred, ...group.proxies])];
+      }
+      if (["Facebook", "Instagram", "Threads"].includes(group.name)) group.proxies = ["Meta-Region", ...group.proxies];
+      if (group.name === "Apple") group.proxies = ["DIRECT", ...group.proxies.filter(n => n !== "DIRECT")];
+      if (group.name === "Apple Push") group.proxies = ["DIRECT", "APNs-Fallback"];
+    });
+  }
+  // Never silently shadow a node with a generated group or built-in outbound.
+  const reserved = new Set(["DIRECT", "REJECT", "REJECT-DROP", "PASS", "PASS-RULE", "COMPATIBLE", ...groups.map(g => g.name)]);
+  if (currentProxyNames.some(name => reserved.has(name))) throw new Error("Runestone: node name conflicts with a generated group or built-in outbound");
+  if (groups.some(g => Object.prototype.hasOwnProperty.call(config["proxy-providers"] || {}, g.name))) {
+    throw new Error("Runestone: provider name conflicts with a generated group");
+  }
+  const knownOutbounds = new Set([...reserved, ...currentProxyNames]);
+  if (currentProxies.some(p => p["dialer-proxy"] && !knownOutbounds.has(p["dialer-proxy"]))) {
+    throw new Error("Runestone: dialer-proxy references a source group that routing replacement would remove");
+  }
   return fixed;
 }
