@@ -864,23 +864,17 @@ function main(config) {
     Threads: ["threads.net", "threads.com"]
   };
   const choices = ["🇯🇵 JP-Auto", "🇸🇬 SG-Auto", ...existingRegionalAutos, "🖥️ All-Nodes"];
-  Object.keys(added).forEach(name => {
-    fixed["proxy-groups"].push({name, type: "select", proxies: [...new Set(choices)].filter(n =>
-      n === "🖥️ All-Nodes" || existingRegionalAutos.includes(n))});
-  });
+  const addedGroups = Object.keys(added).map(name => ({
+    name, type: "select", proxies: [...new Set(choices)].filter(n =>
+      n === "🖥️ All-Nodes" || existingRegionalAutos.includes(n))
+  }));
+  const afterSpeedtest = fixed["proxy-groups"].findIndex(g => g.name === "Speedtest") + 1;
+  fixed["proxy-groups"].splice(afterSpeedtest, 0, ...addedGroups);
   const beforeServices = fixed.rules.findIndex(r => r === "DOMAIN-SUFFIX,youtube.com,YouTube");
   fixed.rules.splice(beforeServices, 0, ...Object.entries(added).flatMap(([name, domains]) =>
     domains.map(domain => "DOMAIN-SUFFIX," + domain + "," + name)));
 
-  // Explicit manual groups permit a stable IP within a chosen region.
-  regionGroups.forEach(region => {
-    const members = currentProxyNames.filter(name => region.filter.test(name));
-    if (members.length) fixed["proxy-groups"].push({name: region.name + "-Manual", type: "select", proxies: members});
-  });
   const groups = fixed["proxy-groups"];
-  const manualNames = groups.filter(g => /-Manual$/.test(g.name)).map(g => g.name);
-  groups.filter(g => g.type === "select" && !/-Manual$/.test(g.name) && g.name !== "🖥️ All-Nodes")
-    .forEach(g => { g.proxies = [...new Set([...g.proxies, ...manualNames])]; });
   const available = new Set(groups.map(g => g.name));
   const regions = {JP: "🇯🇵 JP", SG: "🇸🇬 SG", HK: "🇭🇰 HK", TW: "🇹🇼 TW", US: "🇺🇸 US", UK: "🇬🇧 UK", MY: "🇲🇾 MY", AU: "🇦🇺 AU", IN: "🇮🇳 IN"};
   const order = {
@@ -893,14 +887,11 @@ function main(config) {
     WhatsApp: ["SG", "JP", "HK"], Telegram: ["SG", "JP", "HK"], LinkedIn: ["SG", "US", "UK"]
   };
   if (RUNESTONE.personal) {
-    groups.push({name: "Meta-Region", type: "select", proxies: ["SG", "JP", "US"].map(k => regions[k] + "-Manual").filter(n => available.has(n)).concat("🖥️ All-Nodes")});
     groups.forEach(group => {
       if (order[group.name]) {
-        const stable = ["GPT", "Claude", "Gemini", "Google", "Spotify", "Facebook", "Instagram", "Threads"].includes(group.name);
-        const preferred = order[group.name].map(k => regions[k] + (stable ? "-Manual" : "-Auto")).filter(n => available.has(n));
+        const preferred = order[group.name].map(k => regions[k] + "-Auto").filter(n => available.has(n));
         group.proxies = [...new Set([...preferred, ...group.proxies])];
       }
-      if (["Facebook", "Instagram", "Threads"].includes(group.name)) group.proxies = ["Meta-Region", ...group.proxies];
       if (group.name === "Apple") group.proxies = ["DIRECT", ...group.proxies.filter(n => n !== "DIRECT")];
       if (group.name === "Apple Push") group.proxies = ["DIRECT", "APNs-Fallback"];
     });

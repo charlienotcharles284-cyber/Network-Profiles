@@ -30,6 +30,12 @@ function validate(c) {
   assert.ok(known.has(target),'missing rule target '+target);
   if(parts[0]==='RULE-SET') assert.ok(c['rule-providers'][parts[1]],'missing provider');
  }
+ const names = [...groups.keys()];
+ const speedtest = names.indexOf('Speedtest');
+ assert.deepEqual(names.slice(speedtest + 1, speedtest + 4), ['Pixiv', 'LinkedIn', 'Threads']);
+ assert.ok(names.indexOf('Threads') < names.findIndex(n => n.endsWith('-Auto')) || !names.some(n => n.endsWith('-Auto')));
+ assert.ok(!names.some(n => n.endsWith('-Manual') || n === 'Meta-Region'));
+ for (const g of groups.values()) assert.ok(!g.proxies.some(n => n.endsWith('-Manual') || n === 'Meta-Region'));
  assert.equal(c.rules.at(-1),'MATCH,PROXY-Gate');
  assert.equal(new Set(c.rules).size,c.rules.length);
 }
@@ -59,13 +65,13 @@ for(const file of files){
   assert.ok(!c.rules.some(r=>/DOMAIN-KEYWORD,(google|copilot|grok),/.test(r)));
  });
 }
-if(files.includes('JS/Runestone_Charlie.js')) test('personal preferences, shared Meta region and fork-only MRS',()=>{
+if(files.includes('JS/Runestone_Charlie.js')) test('personal Auto preferences and fork-only MRS',()=>{
  const c=run('JS/Runestone_Charlie.js',{proxies:nodes(['日本','新加坡','马来西亚','美国'])});
  const group=n=>c['proxy-groups'].find(g=>g.name===n);
- assert.equal(group('GPT').proxies[0],'🇯🇵 JP-Manual');
+ assert.equal(group('GPT').proxies[0],'🇯🇵 JP-Auto');
  assert.equal(group('YouTube').proxies[0],'🇯🇵 JP-Auto');
- assert.equal(group('Spotify').proxies[0],'🇲🇾 MY-Manual');
+ assert.equal(group('Spotify').proxies[0],'🇲🇾 MY-Auto');
  assert.equal(group('Apple').proxies[0],'DIRECT');
- for(const n of ['Facebook','Instagram','Threads']) assert.equal(group(n).proxies[0],'Meta-Region');
+ for(const n of ['Facebook','Instagram','Threads']) assert.equal(group(n).proxies[0],'🇸🇬 SG-Auto');
  for(const p of Object.values(c['rule-providers']).filter(p=>p.url.includes('/Network-Profiles/'))) assert.ok(p.url.includes('charlienotcharles284-cyber/Network-Profiles'));
 });

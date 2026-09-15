@@ -8,16 +8,16 @@ https://raw.githubusercontent.com/charlienotcharles284-cyber/Network-Profiles/ma
 | 服务 | 新配置初始选择 |
 |---|---|
 | 国内命中规则 | DIRECT |
-| Facebook / Instagram / Threads | 共用 Meta-Region，新加坡手选节点优先 |
+| Facebook / Instagram / Threads | 各自优先新加坡 Auto |
 | WhatsApp / Telegram / LinkedIn | 新加坡 Auto |
 | Pixiv / X / YouTube / GitHub | 日本 Auto |
-| ChatGPT / Claude / Gemini / Google（含 Gmail） | 日本 Manual |
-| Spotify | 马来西亚 Manual 优先；首次导入务必按账号实际地区选择 |
+| ChatGPT / Claude / Gemini / Google（含 Gmail） | 日本 Auto |
+| Spotify | 马来西亚 Auto 优先；首次导入务必按账号实际地区选择 |
 | Apple / Apple Push | DIRECT 优先，Push 保留代理回退 |
 
-以上只从实际存在的组中选择；不存在首选地区时按备选排序。已有客户端记忆选择可能覆盖新的排序，升级后检查一次。Manual 默认成员也可能因订阅改名而变化。
+以上只从实际存在的组中选择；不存在首选地区时按备选排序。已有客户端记忆选择可能覆盖新的排序，升级后检查一次。Auto 会根据测速在同一地区内选择节点。
 
-澳洲、印度、马来西亚均可在服务组中选择。服务组的列表顺序不是跨国自动故障切换。Meta 三个服务共享一个手动地区组，修改它即可一起调整。
+澳洲、印度、马来西亚均可在服务组中选择。服务组的列表顺序不是跨国自动故障切换。所有地区仅保留 Auto 组，Meta 服务各自选择地区。Pixiv、LinkedIn、Threads 紧接 Speedtest 排列。
 
 AI 组保留手动选择其他出口的能力；排序不代表服务地区资格保证。Spotify 默认马来西亚只是历史偏好预设，不会修改账号地区、付款地区或会员资格。YouTube 默认日本，若需要匹配现有会员地区请手动调整。
 
