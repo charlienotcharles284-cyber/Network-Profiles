@@ -30,3 +30,5 @@ node --test tests/runestone.test.cjs
 ```
 
 只编辑 Runestone_V3.js，再生成个人版本，避免重复维护逻辑。
+
+三个新增服务的域名现已每日同步上游并转换 MRS。迁移时重新导入一次此脚本，后续域名更新由远程规则集刷新完成，详情见 [每日更新说明](RUNESTONE_V3.md#pixiv--linkedin--threads-每日更新)。

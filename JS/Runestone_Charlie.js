@@ -875,18 +875,23 @@ function main(config) {
     provider.url = provider.url.replace("Sydney-Moses/Network-Profiles", RUNESTONE.repository);
   });
   fixed.rules = [...new Set(fixed.rules)];
-  const added = {
-    Pixiv: ["pixiv.net", "pximg.net"],
-    LinkedIn: ["linkedin.com", "licdn.com", "lnkd.in"],
-    Threads: ["threads.net", "threads.com"]
-  };
+  const added = ["Pixiv", "LinkedIn", "Threads"];
+  added.forEach(name => {
+    fixed["rule-providers"][name + "_Domain"] = {
+      type: "http",
+      behavior: "domain",
+      format: "mrs",
+      interval: 86400,
+      url: "https://raw.githubusercontent.com/" + RUNESTONE.repository + "/main/MRS/" + name + "_Domain.mrs"
+    };
+  });
   const choices = ["🇯🇵 JP-Auto", "🇸🇬 SG-Auto", ...existingRegionalAutos, "🖥️ All-Nodes"];
   const serviceIcons = {
     Pixiv: "https://www.google.com/s2/favicons?domain=www.pixiv.net&sz=128",
     LinkedIn: "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/linkedin.png",
     Threads: "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/threads.png"
   };
-  const addedGroups = Object.keys(added).map(name => ({
+  const addedGroups = added.map(name => ({
     name,
     type: "select",
     icon: serviceIcons[name],
@@ -896,8 +901,8 @@ function main(config) {
   const afterSpeedtest = fixed["proxy-groups"].findIndex(g => g.name === "Speedtest") + 1;
   fixed["proxy-groups"].splice(afterSpeedtest, 0, ...addedGroups);
   const beforeServices = fixed.rules.findIndex(r => r === "DOMAIN-SUFFIX,youtube.com,YouTube");
-  fixed.rules.splice(beforeServices, 0, ...Object.entries(added).flatMap(([name, domains]) =>
-    domains.map(domain => "DOMAIN-SUFFIX," + domain + "," + name)));
+  fixed.rules.splice(beforeServices, 0, ...added.map(name =>
+    "RULE-SET," + name + "_Domain," + name));
 
   const groups = fixed["proxy-groups"];
   const available = new Set(groups.map(g => g.name));
