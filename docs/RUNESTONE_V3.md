@@ -1,4 +1,4 @@
-# Runestone V3（首版，待真实订阅验收）
+# Runestone V3 兼容性与维护说明
 
 V3 从 V2 演进，适用于 Hako 合并节点来源之后的 JavaScript 覆写阶段。保留 V1/V2；原有 YAML 配置不会自动升级为 V3。
 
@@ -60,7 +60,7 @@ URL 导入保存的是脚本文本快照。更新 JS 后需要重新导入；rul
 - 上游为 blackmatrix7/ios_rule_script 的对应 Clash YAML。转换保留 DOMAIN 精确匹配和 DOMAIN-SUFFIX 后缀匹配的区别。
 - 本地补充在 `Rules/service-additions.json`，目前保留上游尚未包含的 threads.com。
 - 输出同时保留可读的 `Rules/*_Domain.yaml`；脚本只加载 MRS，不重复加载这份 YAML。
-- 三份源全部通过校验和转换后才替换产物；空源、不支持的规则类型或转换失败会终止工作流，不提交部分更新。
+- 三个服务分别校验和转换。某个服务失败时保留该服务上次可用产物，并继续处理其他服务；服务规则同步失败也不会阻断 ChinaMax、Privacy、Advertising 和 Apple 等核心规则更新。
 - 覆写脚本的远程规则集刷新间隔为 86400 秒。此次迁移需重新导入 JS 一次，以后这三个服务的域名数据更新无需再导入 JS。
 - 分组、图标、地区默认顺序和其他写在 JS 中的服务域名仍需重新导入 JS 更新。
 - Pixiv 上游还包括 Booth、Fanbox 等关联域名；LinkedIn 上游也含地区域名及服务资源，范围比旧版手写列表更完整。

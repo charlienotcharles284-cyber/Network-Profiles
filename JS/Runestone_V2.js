@@ -59,7 +59,7 @@ function main(config) {
 
       "default-nameserver": [
         "223.5.5.5",
-        "119.29.29.29",
+        "119.29.29.119",
         "2400:3200::1"
       ],
 
@@ -343,10 +343,11 @@ function main(config) {
   });
 
   // Apple 紧跟 Google
+  // 注意：这里只修改普通 Apple 策略组图标。
   fixed["proxy-groups"].push({
     "name": "Apple",
     "type": "select",
-    "icon": "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Apple.png",
+    "icon": "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple_2.png",
     "proxies": [
       "🖥️ All-Nodes",
       "PROXY-Gate",
@@ -436,7 +437,14 @@ function main(config) {
   //
   // 直接读取 Hako 合并后的完整 config.proxies。
   //
-  // 没有节点的地区不会生成策略组。
+  // 只有匹配到 3 个及以上节点才生成对应地区 Auto。
+  //
+  // 少于 3 个：
+  // - 不生成 Auto
+  // - 不加入服务策略组
+  // - 不加入 APNs-Fallback
+  //
+  // 所有 Auto 组统一使用 Auto.png 图标。
   // ============================================================
 
   const regionGroups = [
@@ -444,63 +452,147 @@ function main(config) {
       key: "US",
       name: "🇺🇸 US",
       filter: /([\[]US[\]]|^US$|USA|United[ _-]?States|\bUS\b|美国|美國|🇺🇸)/i,
-      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/United_States.png"
+      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
     },
 
     {
       key: "SG",
       name: "🇸🇬 SG",
       filter: /([\[]SG[\]]|^SG$|Singapore|\bSG\b|新加坡|狮城|🇸🇬)/i,
-      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Singapore.png"
+      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
     },
 
     {
       key: "HK",
       name: "🇭🇰 HK",
       filter: /([\[]HK[\]]|^HK$|Hong[ _-]?Kong|\bHK\b|香港|🇭🇰)/i,
-      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Hong_Kong.png"
+      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
     },
 
     {
       key: "JP",
       name: "🇯🇵 JP",
       filter: /([\[]JP[\]]|^JP$|Japan|\bJP\b|日本|东京|大阪|🇯🇵)/i,
-      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Japan.png"
+      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
     },
 
     {
       key: "TW",
       name: "🇹🇼 TW",
       filter: /([\[]TW[\]]|^TW$|Taiwan|Taibei|Taipei|\bTW\b|台湾|臺灣|台北|高雄|🇹🇼)/i,
-      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Taiwan.png"
+      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
     },
 
     {
       key: "UK",
       name: "🇬🇧 UK",
       filter: /([\[]UK[\]]|^UK$|United[ _-]?Kingdom|Britain|England|\bUK\b|英国|英國|伦敦|🇬🇧)/i,
-      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/United_Kingdom.png"
+      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
     },
 
     {
       key: "DE",
       name: "🇩🇪 DE",
       filter: /([\[]DE[\]]|^DE$|Germany|Deutschland|\bDE\b|德国|德國|法兰克福|🇩🇪)/i,
-      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Germany.png"
+      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
     },
 
     {
       key: "FR",
       name: "🇫🇷 FR",
       filter: /([\[]FR[\]]|^FR$|France|\bFR\b|法国|法國|巴黎|🇫🇷)/i,
-      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/France.png"
+      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
     },
 
     {
       key: "RU",
       name: "🇷🇺 RU",
       filter: /([\[]RU[\]]|^RU$|Russia|Russian[ _-]?Federation|\bRU\b|俄罗斯|俄羅斯|莫斯科|伯力|🇷🇺)/i,
-      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Russia.png"
+      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
+    },
+
+    {
+      key: "CA",
+      name: "🇨🇦 CA",
+      filter: /([\[]CA[\]]|^CA$|Canada|\bCA\b|加拿大|🇨🇦)/i,
+      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
+    },
+
+    {
+      key: "AU",
+      name: "🇦🇺 AU",
+      filter: /([\[]AU[\]]|^AU$|Australia|\bAU\b|澳大利亚|澳洲|澳大利亞|🇦🇺)/i,
+      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
+    },
+
+    {
+      key: "KR",
+      name: "🇰🇷 KR",
+      filter: /([\[]KR[\]]|^KR$|Korea|South[ _-]?Korea|\bKR\b|韩国|韓國|首尔|首爾|🇰🇷)/i,
+      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
+    },
+
+    {
+      key: "IT",
+      name: "🇮🇹 IT",
+      filter: /([\[]IT[\]]|^IT$|Italy|Italian|\bIT\b|意大利|義大利|米兰|米蘭|罗马|羅馬|🇮🇹)/i,
+      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
+    },
+
+    {
+      key: "ES",
+      name: "🇪🇸 ES",
+      filter: /([\[]ES[\]]|^ES$|Spain|Spanish|\bES\b|西班牙|马德里|馬德里|🇪🇸)/i,
+      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
+    },
+
+    {
+      key: "NL",
+      name: "🇳🇱 NL",
+      filter: /([\[]NL[\]]|^NL$|Netherlands|Dutch|\bNL\b|荷兰|荷蘭|阿姆斯特丹|🇳🇱)/i,
+      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
+    },
+
+    {
+      key: "FI",
+      name: "🇫🇮 FI",
+      filter: /([\[]FI[\]]|^FI$|Finland|Finnish|\bFI\b|芬兰|芬蘭|赫尔辛基|赫爾辛基|🇫🇮)/i,
+      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
+    },
+
+    {
+      key: "NO",
+      name: "🇳🇴 NO",
+      filter: /([\[]NO[\]]|^NO$|Norway|Norwegian|\bNO\b|挪威|奥斯陆|奧斯陸|🇳🇴)/i,
+      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
+    },
+
+    {
+      key: "SE",
+      name: "🇸🇪 SE",
+      filter: /([\[]SE[\]]|^SE$|Sweden|Swedish|\bSE\b|瑞典|斯德哥尔摩|斯德哥爾摩|🇸🇪)/i,
+      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
+    },
+
+    {
+      key: "CH",
+      name: "🇨🇭 CH",
+      filter: /([\[]CH[\]]|^CH$|Switzerland|Swiss|\bCH\b|瑞士|苏黎世|蘇黎世|日内瓦|日內瓦|🇨🇭)/i,
+      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
+    },
+
+    {
+      key: "PL",
+      name: "🇵🇱 PL",
+      filter: /([\[]PL[\]]|^PL$|Poland|Polish|\bPL\b|波兰|波蘭|华沙|華沙|🇵🇱)/i,
+      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
+    },
+
+    {
+      key: "MY",
+      name: "🇲🇾 MY",
+      filter: /([\[]MY[\]]|^MY$|Malaysia|Malaysian|\bMY\b|马来西亚|馬來西亞|吉隆坡|🇲🇾)/i,
+      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
     }
   ];
 
@@ -513,8 +605,8 @@ function main(config) {
 
     const autoName = region.name + "-Auto";
 
-    // 没有节点则完全不生成该地区组。
-    if (matched.length === 0) {
+    // 只有 3 个及以上节点才生成该地区 Auto。
+    if (matched.length < 3) {
       return;
     }
 
@@ -528,24 +620,15 @@ function main(config) {
       tolerance: 50
     });
 
+    // 这里只记录实际生成的 Auto。
+    // 后续服务策略组和 APNs-Fallback 都只引用这个数组。
     existingRegionalAutos.push(autoName);
   });
 
   // ============================================================
   // 4. 将实际存在的 Auto 组加入服务策略组
   //
-  // 例如：
-  // 如果实际只有 US / SG / JP：
-  //
-  // YouTube:
-  // All-Nodes
-  // US-Auto
-  // SG-Auto
-  // JP-Auto
-  // PROXY-Gate
-  // DIRECT
-  //
-  // 不会出现不存在的 FR-Auto / RU-Auto。
+  // 只有达到 3 个节点的地区才会出现在这里。
   // ============================================================
 
   const serviceProxyChoices = [
@@ -587,7 +670,7 @@ function main(config) {
   // ============================================================
   // 5. PROXY-Gate
   //
-  // 同样只加入实际存在的地区 Auto。
+  // 同样只加入实际生成的地区 Auto。
   // ============================================================
 
   const proxyGate = fixed["proxy-groups"].find(
@@ -607,16 +690,7 @@ function main(config) {
   //
   // 只引用实际生成的地区 Auto。
   //
-  // Apple Push 本身仍然保持：
-  // Apple Push
-  //   ├─ APNs-Fallback
-  //   └─ DIRECT
-  //
-  // APNs-Fallback：
-  //   ├─ US-Auto（如果存在）
-  //   ├─ SG-Auto（如果存在）
-  //   ├─ HK-Auto（如果存在）
-  //   └─ ...
+  // 少于 3 个节点的地区不会出现在这里。
   // ============================================================
 
   fixed["proxy-groups"].push({
@@ -896,7 +970,7 @@ function main(config) {
       "behavior": "domain",
       "format": "mrs",
       "interval": 86400,
-      "url": "https://raw.githubusercontent.com/charlienotcharles284-cyber/Network-Profiles/refs/heads/main/MRS/Apple_Domain.mrs"
+      "url": "https://raw.githubusercontent.com/Sydney-Moses/Network-Profiles/refs/heads/main/MRS/Apple_Domain.mrs"
     },
 
     "AdvertisingLite": {
@@ -912,7 +986,7 @@ function main(config) {
       "behavior": "domain",
       "format": "mrs",
       "interval": 86400,
-      "url": "https://raw.githubusercontent.com/charlienotcharles284-cyber/Network-Profiles/refs/heads/main/MRS/AdvertisingLite_Domain.mrs"
+      "url": "https://raw.githubusercontent.com/Sydney-Moses/Network-Profiles/refs/heads/main/MRS/AdvertisingLite_Domain.mrs"
     },
 
     "Privacy": {
@@ -928,7 +1002,7 @@ function main(config) {
       "behavior": "domain",
       "format": "mrs",
       "interval": 86400,
-      "url": "https://raw.githubusercontent.com/charlienotcharles284-cyber/Network-Profiles/refs/heads/main/MRS/Privacy_Domain.mrs"
+      "url": "https://raw.githubusercontent.com/Sydney-Moses/Network-Profiles/refs/heads/main/MRS/Privacy_Domain.mrs"
     },
 
     "ACL4SSR_BanAD": {
@@ -960,7 +1034,7 @@ function main(config) {
       "behavior": "domain",
       "format": "mrs",
       "interval": 86400,
-      "url": "https://raw.githubusercontent.com/charlienotcharles284-cyber/Network-Profiles/refs/heads/main/MRS/ChinaMax_Domain.mrs"
+      "url": "https://raw.githubusercontent.com/Sydney-Moses/Network-Profiles/refs/heads/main/MRS/ChinaMax_Domain.mrs"
     },
 
     "ChinaMax_IP": {
@@ -968,7 +1042,7 @@ function main(config) {
       "behavior": "ipcidr",
       "format": "mrs",
       "interval": 86400,
-      "url": "https://raw.githubusercontent.com/charlienotcharles284-cyber/Network-Profiles/refs/heads/main/MRS/ChinaMax_IP.mrs"
+      "url": "https://raw.githubusercontent.com/Sydney-Moses/Network-Profiles/refs/heads/main/MRS/ChinaMax_IP.mrs"
     }
   };
 

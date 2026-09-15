@@ -3,7 +3,7 @@
  * Network settings and node objects are retained. Rules and groups are replaced.
  * URL import is a snapshot: re-import to upgrade. See docs/RUNESTONE_V3.md.
  */
-const RUNESTONE = {repository: "charlienotcharles284-cyber/Network-Profiles", personal: false};
+const RUNESTONE = {repository: "Sydney-Moses/Network-Profiles", personal: false};
 
 function main(config) {
   // Hako 当前选中的所有机场节点都会合并到 config.proxies。
