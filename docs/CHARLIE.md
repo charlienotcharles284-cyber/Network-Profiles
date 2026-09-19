@@ -1,9 +1,12 @@
 # Charlie 个人预设
 
-导入 URL：
+稳定版导入 URL：
 https://raw.githubusercontent.com/charlienotcharles284-cyber/Network-Profiles/main/JS/Runestone_Charlie.js
 
-先阅读 [V3 导入与回退](RUNESTONE_V3.md)。该版本待真实订阅验收，本机应用识别为 1.0.10（52）；没有更改正在使用的 Hako 配置。
+MIPS Beta 导入 URL：
+https://raw.githubusercontent.com/charlienotcharles284-cyber/Network-Profiles/main/JS/Runestone_Charlie_Beta.js
+
+先阅读 [V3 导入与回退](RUNESTONE_V3.md)。稳定版保留 Hako 传入的网络配置；Beta 只将 `tun.stack` 设为 `mips`，保留其余 TUN、DNS 和节点设置。Beta 应在复制的测试配置中使用。
 
 | 服务 | 新配置初始选择 |
 |---|---|
@@ -21,7 +24,7 @@ https://raw.githubusercontent.com/charlienotcharles284-cyber/Network-Profiles/ma
 
 AI 组保留手动选择其他出口的能力；排序不代表服务地区资格保证。Spotify 默认马来西亚只是历史偏好预设，不会修改账号地区、付款地区或会员资格。YouTube 默认日本，若需要匹配现有会员地区请手动调整。
 
-V1/V2 仅修复 Fork MRS 地址，作为旧行为回退入口。V3 通用版与个人版统一来源：
+V1/V2 作为完整网络配置的回退入口。V3 通用版、个人稳定版和 Beta 统一由构建脚本生成：
 
 ```
 node scripts/build-personal.cjs
@@ -29,6 +32,8 @@ node scripts/build-personal.cjs --check
 node --test tests/runestone.test.cjs
 ```
 
-只编辑 Runestone_V3.js，再生成个人版本，避免重复维护逻辑。
+只编辑 Runestone_V3.js，再生成个人版本，避免重复维护逻辑。Beta 的 MIPS 覆盖由构建脚本注入。
+
+稳定版本可通过仓库 tag 固定；`main` 用于接受后续已验证更新。详见 [版本兼容记录](COMPATIBILITY.md)。
 
 三个新增服务的域名现已每日同步上游并转换 MRS。迁移时重新导入一次此脚本，后续域名更新由远程规则集刷新完成，详情见 [每日更新说明](RUNESTONE_V3.md#pixiv--linkedin--threads-每日更新)。

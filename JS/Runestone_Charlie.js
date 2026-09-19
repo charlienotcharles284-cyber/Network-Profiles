@@ -31,6 +31,7 @@ function main(config) {
   if (new Set(currentProxyNames).size !== currentProxyNames.length) {
     throw new Error("Runestone: duplicate node names; rename conflicting nodes in the source");
   }
+
   // Preserve client-owned networking and provider fields. Replace routing below.
   const fixed = Object.assign({}, config);
   fixed.mode = "rule";
@@ -191,6 +192,19 @@ function main(config) {
     "name": "Copilot",
     "type": "select",
     "icon": "https://fastly.jsdelivr.net/gh/Hawaiine/Oasisic-Icons@main/icons/Microsoft/Copilot-1.png",
+    "proxies": [
+      "🖥️ All-Nodes",
+      "PROXY-Gate",
+      "DIRECT"
+    ]
+  });
+
+  // Microsoft 紧跟 Copilot
+  // Copilot 保持独立，不并入 Microsoft。
+  fixed["proxy-groups"].push({
+    "name": "Microsoft",
+    "type": "select",
+    "icon": "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Microsoft.png",
     "proxies": [
       "🖥️ All-Nodes",
       "PROXY-Gate",
@@ -446,7 +460,7 @@ function main(config) {
   // PROXY-Gate
   // DIRECT
   //
-  // 不会出现不存在的 FR-Auto / RU-Auto。
+  // Microsoft 同样自动获得实际存在的地区 Auto。
   // ============================================================
 
   const serviceProxyChoices = [
@@ -467,6 +481,7 @@ function main(config) {
     "Gemini",
     "Claude",
     "Copilot",
+    "Microsoft",
     "Grok",
     "Google",
     "Apple",
@@ -688,11 +703,146 @@ function main(config) {
     "DOMAIN-SUFFIX,claudeusercontent.com,Claude",
     "DOMAIN-SUFFIX,claudeusercontent.com.cdn.cloudflare.net,Claude",
 
+    // ============================================================
     // Copilot
+    //
+    // 必须位于 Microsoft 通用规则之前。
+    // ============================================================
+
     "DOMAIN-SUFFIX,copilot.microsoft.com,Copilot",
     "DOMAIN-SUFFIX,ai.microsoft.com,Copilot",
     "DOMAIN-SUFFIX,designer.microsoft.com,Copilot",
     "DOMAIN-SUFFIX,copilot.com,Copilot",
+
+    // ============================================================
+    // Microsoft
+    //
+    // Microsoft 独立策略组。
+    //
+    // Copilot 已在上方单独匹配，因此这里不处理 Copilot。
+    // ============================================================
+
+    // Microsoft Account / Identity / Login
+    "DOMAIN-SUFFIX,account.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,account.live.com,Microsoft",
+    "DOMAIN-SUFFIX,login.live.com,Microsoft",
+    "DOMAIN-SUFFIX,login.microsoftonline.com,Microsoft",
+    "DOMAIN-SUFFIX,login.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,login.windows.net,Microsoft",
+    "DOMAIN-SUFFIX,msauth.net,Microsoft",
+    "DOMAIN-SUFFIX,msauthimages.net,Microsoft",
+    "DOMAIN-SUFFIX,msftauth.net,Microsoft",
+    "DOMAIN-SUFFIX,msftauthimages.net,Microsoft",
+    "DOMAIN-SUFFIX,msidentity.com,Microsoft",
+    "DOMAIN-SUFFIX,live.com,Microsoft",
+    "DOMAIN-SUFFIX,live.net,Microsoft",
+
+    // Outlook / Hotmail / Mail
+    "DOMAIN-SUFFIX,outlook.com,Microsoft",
+    "DOMAIN-SUFFIX,outlook.live.com,Microsoft",
+    "DOMAIN-SUFFIX,outlook.office.com,Microsoft",
+    "DOMAIN-SUFFIX,hotmail.com,Microsoft",
+    "DOMAIN-SUFFIX,hotmail.co.uk,Microsoft",
+    "DOMAIN-SUFFIX,office365.com,Microsoft",
+
+    // Microsoft 365 / Office
+    "DOMAIN-SUFFIX,microsoft365.com,Microsoft",
+    "DOMAIN-SUFFIX,microsoft365.us,Microsoft",
+    "DOMAIN-SUFFIX,office.com,Microsoft",
+    "DOMAIN-SUFFIX,office.net,Microsoft",
+    "DOMAIN-SUFFIX,office365.com,Microsoft",
+    "DOMAIN-SUFFIX,officeapps.live.com,Microsoft",
+    "DOMAIN-SUFFIX,officeclient.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,officecdn.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,msocdn.com,Microsoft",
+    "DOMAIN-SUFFIX,microsoftonline.com,Microsoft",
+    "DOMAIN-SUFFIX,microsoftonline-p.com,Microsoft",
+    "DOMAIN-SUFFIX,microsoftonline-p.net,Microsoft",
+
+    // OneDrive
+    "DOMAIN-SUFFIX,onedrive.com,Microsoft",
+    "DOMAIN-SUFFIX,onedrive.live.com,Microsoft",
+    "DOMAIN-SUFFIX,1drv.com,Microsoft",
+    "DOMAIN-SUFFIX,onedriveusercontent.com,Microsoft",
+
+    // SharePoint
+    "DOMAIN-SUFFIX,sharepoint.com,Microsoft",
+    "DOMAIN-SUFFIX,sharepointonline.com,Microsoft",
+
+    // Microsoft Teams
+    "DOMAIN-SUFFIX,teams.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,teams.live.com,Microsoft",
+    "DOMAIN-SUFFIX,teams.cloud.microsoft,Microsoft",
+    "DOMAIN-SUFFIX,skype.com,Microsoft",
+    "DOMAIN-SUFFIX,skypeassets.com,Microsoft",
+
+    // Microsoft Store
+    "DOMAIN-SUFFIX,microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,microsoftstore.com,Microsoft",
+    "DOMAIN-SUFFIX,apps.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,storeedgefd.dsx.mp.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,displaycatalog.mp.microsoft.com,Microsoft",
+
+    // Windows / Windows Update
+    "DOMAIN-SUFFIX,windows.com,Microsoft",
+    "DOMAIN-SUFFIX,windows.net,Microsoft",
+    "DOMAIN-SUFFIX,windowsupdate.com,Microsoft",
+    "DOMAIN-SUFFIX,update.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,windowsupdate.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,download.windowsupdate.com,Microsoft",
+    "DOMAIN-SUFFIX,delivery.mp.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,dl.delivery.mp.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,ctldl.windowsupdate.com,Microsoft",
+    "DOMAIN-SUFFIX,emdl.ws.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,do.dsp.mp.microsoft.com,Microsoft",
+
+    // Microsoft Services / CDN
+    "DOMAIN-SUFFIX,azureedge.net,Microsoft",
+    "DOMAIN-SUFFIX,azurefd.net,Microsoft",
+    "DOMAIN-SUFFIX,msft.net,Microsoft",
+    "DOMAIN-SUFFIX,msftncsi.com,Microsoft",
+    "DOMAIN-SUFFIX,msftconnecttest.com,Microsoft",
+    "DOMAIN-SUFFIX,msecnd.net,Microsoft",
+    "DOMAIN-SUFFIX,edgesuite.net,Microsoft",
+
+    // Azure
+    "DOMAIN-SUFFIX,azure.com,Microsoft",
+    "DOMAIN-SUFFIX,azure.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,azurewebsites.net,Microsoft",
+    "DOMAIN-SUFFIX,cloudapp.azure.com,Microsoft",
+    "DOMAIN-SUFFIX,management.azure.com,Microsoft",
+    "DOMAIN-SUFFIX,portal.azure.com,Microsoft",
+    "DOMAIN-SUFFIX,graph.microsoft.com,Microsoft",
+
+    // Microsoft Graph / APIs
+    "DOMAIN-SUFFIX,graph.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,graph.windows.net,Microsoft",
+    "DOMAIN-SUFFIX,api.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,apis.microsoft.com,Microsoft",
+
+    // Xbox
+    "DOMAIN-SUFFIX,xbox.com,Microsoft",
+    "DOMAIN-SUFFIX,xboxlive.com,Microsoft",
+    "DOMAIN-SUFFIX,xboxlive.net,Microsoft",
+    "DOMAIN-SUFFIX,gamepass.com,Microsoft",
+
+    // Visual Studio / Developer
+    "DOMAIN-SUFFIX,visualstudio.com,Microsoft",
+    "DOMAIN-SUFFIX,visualstudio.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,vsassets.io,Microsoft",
+    "DOMAIN-SUFFIX,nuget.org,Microsoft",
+
+    // Bing
+    "DOMAIN-SUFFIX,bing.com,Microsoft",
+    "DOMAIN-SUFFIX,bing.net,Microsoft",
+
+    // Microsoft telemetry / diagnostics
+    "DOMAIN-SUFFIX,events.data.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,v10.events.data.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,v20.events.data.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,settings-win.data.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,watson.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,watson.telemetry.microsoft.com,Microsoft",
 
     // Grok
     "DOMAIN-SUFFIX,grok.com,Grok",
@@ -794,7 +944,7 @@ function main(config) {
       "behavior": "domain",
       "format": "mrs",
       "interval": 86400,
-      "url": "https://raw.githubusercontent.com/Sydney-Moses/Network-Profiles/refs/heads/main/MRS/Apple_Domain.mrs"
+      "url": "https://raw.githubusercontent.com/kiki-rgb-00/kiki/refs/heads/main/MRS/Apple_Domain.mrs"
     },
 
     "AdvertisingLite": {
@@ -810,7 +960,7 @@ function main(config) {
       "behavior": "domain",
       "format": "mrs",
       "interval": 86400,
-      "url": "https://raw.githubusercontent.com/Sydney-Moses/Network-Profiles/refs/heads/main/MRS/AdvertisingLite_Domain.mrs"
+      "url": "https://raw.githubusercontent.com/kiki-rgb-00/kiki/refs/heads/main/MRS/AdvertisingLite_Domain.mrs"
     },
 
     "Privacy": {
@@ -826,7 +976,7 @@ function main(config) {
       "behavior": "domain",
       "format": "mrs",
       "interval": 86400,
-      "url": "https://raw.githubusercontent.com/Sydney-Moses/Network-Profiles/refs/heads/main/MRS/Privacy_Domain.mrs"
+      "url": "https://raw.githubusercontent.com/kiki-rgb-00/kiki/refs/heads/main/MRS/Privacy_Domain.mrs"
     },
 
     "ACL4SSR_BanAD": {
@@ -858,7 +1008,7 @@ function main(config) {
       "behavior": "domain",
       "format": "mrs",
       "interval": 86400,
-      "url": "https://raw.githubusercontent.com/Sydney-Moses/Network-Profiles/refs/heads/main/MRS/ChinaMax_Domain.mrs"
+      "url": "https://raw.githubusercontent.com/kiki-rgb-00/kiki/refs/heads/main/MRS/ChinaMax_Domain.mrs"
     },
 
     "ChinaMax_IP": {
@@ -866,75 +1016,192 @@ function main(config) {
       "behavior": "ipcidr",
       "format": "mrs",
       "interval": 86400,
-      "url": "https://raw.githubusercontent.com/Sydney-Moses/Network-Profiles/refs/heads/main/MRS/ChinaMax_IP.mrs"
+      "url": "https://raw.githubusercontent.com/kiki-rgb-00/kiki/refs/heads/main/MRS/ChinaMax_IP.mrs"
     }
   };
 
   // All project-owned MRS resources follow one configurable repository.
   Object.values(fixed["rule-providers"]).forEach(provider => {
-    provider.url = provider.url.replace("Sydney-Moses/Network-Profiles", RUNESTONE.repository);
+    provider.url = provider.url.replace(
+      /^https:\/\/raw\.githubusercontent\.com\/[^/]+\/[^/]+\/(?:refs\/heads\/)?main\/MRS\//,
+      "https://raw.githubusercontent.com/" + RUNESTONE.repository + "/main/MRS/"
+    );
   });
+
   fixed.rules = [...new Set(fixed.rules)];
+
   const added = ["Pixiv", "LinkedIn", "Threads"];
+
   added.forEach(name => {
     fixed["rule-providers"][name + "_Domain"] = {
       type: "http",
       behavior: "domain",
       format: "mrs",
       interval: 86400,
-      url: "https://raw.githubusercontent.com/" + RUNESTONE.repository + "/main/MRS/" + name + "_Domain.mrs"
+      url:
+        "https://raw.githubusercontent.com/" +
+        RUNESTONE.repository +
+        "/main/MRS/" +
+        name +
+        "_Domain.mrs"
     };
   });
-  const choices = ["🇯🇵 JP-Auto", "🇸🇬 SG-Auto", ...existingRegionalAutos, "🖥️ All-Nodes"];
+
+  const choices = [
+    "🇯🇵 JP-Auto",
+    "🇸🇬 SG-Auto",
+    ...existingRegionalAutos,
+    "🖥️ All-Nodes"
+  ];
+
   const serviceIcons = {
     Pixiv: "https://www.google.com/s2/favicons?domain=www.pixiv.net&sz=128",
     LinkedIn: "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/linkedin.png",
     Threads: "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/threads.png"
   };
+
   const addedGroups = added.map(name => ({
     name,
     type: "select",
     icon: serviceIcons[name],
     proxies: [...new Set(choices)].filter(n =>
-      n === "🖥️ All-Nodes" || existingRegionalAutos.includes(n))
+      n === "🖥️ All-Nodes" || existingRegionalAutos.includes(n)
+    )
   }));
-  const afterSpeedtest = fixed["proxy-groups"].findIndex(g => g.name === "Speedtest") + 1;
-  fixed["proxy-groups"].splice(afterSpeedtest, 0, ...addedGroups);
-  const beforeServices = fixed.rules.findIndex(r => r === "DOMAIN-SUFFIX,youtube.com,YouTube");
-  fixed.rules.splice(beforeServices, 0, ...added.map(name =>
-    "RULE-SET," + name + "_Domain," + name));
+
+  const afterSpeedtest =
+    fixed["proxy-groups"].findIndex(g => g.name === "Speedtest") + 1;
+
+  fixed["proxy-groups"].splice(
+    afterSpeedtest,
+    0,
+    ...addedGroups
+  );
+
+  const beforeServices =
+    fixed.rules.findIndex(
+      r => r === "DOMAIN-SUFFIX,youtube.com,YouTube"
+    );
+
+  fixed.rules.splice(
+    beforeServices,
+    0,
+    ...added.map(
+      name => "RULE-SET," + name + "_Domain," + name
+    )
+  );
 
   const groups = fixed["proxy-groups"];
   const available = new Set(groups.map(g => g.name));
-  const regions = {JP: "🇯🇵 JP", SG: "🇸🇬 SG", HK: "🇭🇰 HK", TW: "🇹🇼 TW", US: "🇺🇸 US", UK: "🇬🇧 UK", MY: "🇲🇾 MY", AU: "🇦🇺 AU", IN: "🇮🇳 IN"};
-  const order = {
-    "PROXY-Gate": ["SG", "JP", "HK"], YouTube: ["JP", "MY", "TW", "SG", "US"],
-    Spotify: ["MY", "IN", "JP", "US"], GPT: ["JP", "SG", "TW", "US"],
-    Claude: ["JP", "SG", "TW", "US"], Gemini: ["JP", "SG", "TW", "US"],
-    Google: ["JP", "SG", "HK"], Github: ["JP", "SG", "HK", "US"],
-    X: ["JP", "TW", "SG"], Pixiv: ["JP", "TW", "SG"],
-    Facebook: ["SG", "JP", "US"], Instagram: ["SG", "JP", "US"], Threads: ["SG", "JP", "US"],
-    WhatsApp: ["SG", "JP", "HK"], Telegram: ["SG", "JP", "HK"], LinkedIn: ["SG", "US", "UK"]
+
+  const regions = {
+    JP: "🇯🇵 JP",
+    SG: "🇸🇬 SG",
+    HK: "🇭🇰 HK",
+    TW: "🇹🇼 TW",
+    US: "🇺🇸 US",
+    UK: "🇬🇧 UK",
+    MY: "🇲🇾 MY",
+    AU: "🇦🇺 AU",
+    IN: "🇮🇳 IN"
   };
+
+  const order = {
+    "PROXY-Gate": ["SG", "JP", "HK"],
+    YouTube: ["JP", "MY", "TW", "SG", "US"],
+    Spotify: ["MY", "IN", "JP", "US"],
+    GPT: ["JP", "SG", "TW", "US"],
+    Claude: ["JP", "SG", "TW", "US"],
+    Gemini: ["JP", "SG", "TW", "US"],
+    Google: ["JP", "SG", "HK"],
+    Github: ["JP", "SG", "HK", "US"],
+    X: ["JP", "TW", "SG"],
+    Pixiv: ["JP", "TW", "SG"],
+    Facebook: ["SG", "JP", "US"],
+    Instagram: ["SG", "JP", "US"],
+    Threads: ["SG", "JP", "US"],
+    WhatsApp: ["SG", "JP", "HK"],
+    Telegram: ["SG", "JP", "HK"],
+    LinkedIn: ["SG", "US", "UK"]
+  };
+
   if (RUNESTONE.personal) {
     groups.forEach(group => {
       if (order[group.name]) {
-        const preferred = order[group.name].map(k => regions[k] + "-Auto").filter(n => available.has(n));
-        group.proxies = [...new Set([...preferred, ...group.proxies])];
+        const preferred = order[group.name]
+          .map(k => regions[k] + "-Auto")
+          .filter(n => available.has(n));
+
+        group.proxies = [
+          ...new Set([
+            ...preferred,
+            ...group.proxies
+          ])
+        ];
       }
-      if (group.name === "Apple") group.proxies = ["DIRECT", ...group.proxies.filter(n => n !== "DIRECT")];
-      if (group.name === "Apple Push") group.proxies = ["DIRECT", "APNs-Fallback"];
+
+      if (group.name === "Apple") {
+        group.proxies = [
+          "DIRECT",
+          ...group.proxies.filter(n => n !== "DIRECT")
+        ];
+      }
+
+      if (group.name === "Apple Push") {
+        group.proxies = [
+          "DIRECT",
+          "APNs-Fallback"
+        ];
+      }
     });
   }
+
   // Never silently shadow a node with a generated group or built-in outbound.
-  const reserved = new Set(["DIRECT", "REJECT", "REJECT-DROP", "PASS", "PASS-RULE", "COMPATIBLE", ...groups.map(g => g.name)]);
-  if (currentProxyNames.some(name => reserved.has(name))) throw new Error("Runestone: node name conflicts with a generated group or built-in outbound");
-  if (groups.some(g => Object.prototype.hasOwnProperty.call(config["proxy-providers"] || {}, g.name))) {
-    throw new Error("Runestone: provider name conflicts with a generated group");
+  const reserved = new Set([
+    "DIRECT",
+    "REJECT",
+    "REJECT-DROP",
+    "PASS",
+    "PASS-RULE",
+    "COMPATIBLE",
+    ...groups.map(g => g.name)
+  ]);
+
+  if (currentProxyNames.some(name => reserved.has(name))) {
+    throw new Error(
+      "Runestone: node name conflicts with a generated group or built-in outbound"
+    );
   }
-  const knownOutbounds = new Set([...reserved, ...currentProxyNames]);
-  if (currentProxies.some(p => p["dialer-proxy"] && !knownOutbounds.has(p["dialer-proxy"]))) {
-    throw new Error("Runestone: dialer-proxy references a source group that routing replacement would remove");
+
+  if (
+    groups.some(g =>
+      Object.prototype.hasOwnProperty.call(
+        config["proxy-providers"] || {},
+        g.name
+      )
+    )
+  ) {
+    throw new Error(
+      "Runestone: provider name conflicts with a generated group"
+    );
   }
+
+  const knownOutbounds = new Set([
+    ...reserved,
+    ...currentProxyNames
+  ]);
+
+  if (
+    currentProxies.some(
+      p =>
+        p["dialer-proxy"] &&
+        !knownOutbounds.has(p["dialer-proxy"])
+    )
+  ) {
+    throw new Error(
+      "Runestone: dialer-proxy references a source group that routing replacement would remove"
+    );
+  }
+
   return fixed;
 }

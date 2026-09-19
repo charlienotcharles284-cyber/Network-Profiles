@@ -1,14 +1,17 @@
 # Charlie 的 Hako 分流个人版
 
-通用 V3 已合并至上游。本 Fork 跟随上游维护 V1/V2/V3，并额外保留
-[个人覆写脚本](JS/Runestone_Charlie.js)，用于个人服务默认地区排序。
+通用 V3 已迁移到 `kiki-rgb-00/kiki`。本 Fork 以文件级同步方式跟随新上游，
+并保留稳定版与 MIPS 测试版个人覆写脚本。
 
-- [个人预设与导入地址](docs/CHARLIE.md)
+- [个人预设、稳定版与 Beta 导入地址](docs/CHARLIE.md)
 - [V3 兼容性、升级、回退与维护路线](docs/RUNESTONE_V3.md)
+- [上游迁移与同步策略](docs/UPSTREAM.md)
+- [版本兼容记录](docs/COMPATIBILITY.md)
+- [MIPS 真机测试矩阵](docs/MIPS_TEST_MATRIX.md)
 - [通用 V3（与上游同步）](JS/Runestone_V3.js)
 
-正式自动化只保留 `Update Rules MRS`。测试文件保留供修改脚本时手动运行，
-不会在每次推送时自动触发。以下保留原项目说明；其中 YAML/MRS
+`Update Rules MRS` 每日更新规则；`Validate Runestone` 仅允许手动触发，
+供修改脚本或测试 TestFlight 版本时运行。以下保留原项目说明；其中 YAML/MRS
 “必须组合”的表述仍待内容重叠审计。
 
 ---

@@ -36,9 +36,6 @@ jobs:
       # =========================
       # Original YAML Rules
       # =========================
-      # These files are kept in their original YAML format
-      # and are not converted to MRS.
-      # =========================
 
       - name: Download Original YAML Rules
         run: |
@@ -155,10 +152,6 @@ jobs:
 
       # =========================
       # Service Rules
-      # =========================
-      # Service rule synchronization is optional.
-      # A failure here must not block the original
-      # ChinaMax / Privacy / Advertising / Apple updates.
       # =========================
 
       - name: Prepare service rule converter

@@ -1,0 +1,38 @@
+name: Validate Runestone
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python test dependency
+        run: python -m pip install PyYAML==6.0.2
+
+      - name: Verify generated scripts
+        run: node scripts/build-personal.cjs --check
+
+      - name: Test Runestone scripts
+        run: node --test tests/runestone.test.cjs
+
+      - name: Test service rule conversion helpers
+        run: python -m unittest tests/test_sync_services.py

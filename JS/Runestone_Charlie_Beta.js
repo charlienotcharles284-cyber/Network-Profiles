@@ -1,18 +1,9 @@
-/*
- * 服务分类配置｜Hako版
- *
- * Hako 会将当前选中的多个节点来源合并到 config.proxies。
- * 本脚本不依赖任何 proxy-providers 名称。
- *
- * 结构：
- * 1. 主策略组
- * 2. 普通服务策略组
- * 3. 根据实际节点动态生成地区 Auto
- * 4. APNs-Fallback
- * 5. Global-Fallback
- * 6. Rules
- * 7. Rule Providers
+/* Runestone Charlie Beta (MIPS) — based on Runestone V3 — routing-only Hako post-merge override.
+ * Import the raw JavaScript URL, save, and select it after node-source merging.
+ * Network settings and node objects are retained. Rules and groups are replaced.
+ * URL import is a snapshot: re-import to upgrade. See docs/RUNESTONE_V3.md.
  */
+const RUNESTONE = {repository: "charlienotcharles284-cyber/Network-Profiles", personal: true, tunStack: "mips"};
 
 function main(config) {
   // Hako 当前选中的所有机场节点都会合并到 config.proxies。
@@ -28,136 +19,25 @@ function main(config) {
     )
     .filter(Boolean);
 
-  const fixed = {
-    "mixed-port": 7890,
-    "allow-lan": false,
-    "bind-address": "*",
-    "mode": "rule",
-    "log-level": "info",
-    "external-controller": "127.0.0.1:9090",
-    "unified-delay": true,
-    "tcp-concurrent": true,
-    "ipv6": true,
+  if (!config || typeof config !== "object" || Array.isArray(config)) {
+    throw new Error("Runestone: expected a configuration object");
+  }
+  if (!currentProxies.length) {
+    throw new Error("Runestone: no materialized nodes; select node sources and use the post-merge script stage");
+  }
+  if (currentProxies.some(p => !p || typeof p !== "object" || typeof p.name !== "string" || !p.name.trim())) {
+    throw new Error("Runestone: every node must be an object with a non-empty name");
+  }
+  if (new Set(currentProxyNames).size !== currentProxyNames.length) {
+    throw new Error("Runestone: duplicate node names; rename conflicting nodes in the source");
+  }
 
-    "tun": {
-      "enable": true,
-      "stack": "gvisor",
-      "auto-route": true,
-      "auto-detect-interface": true,
-      "strict-route": true,
-      "dns-hijack": [
-        "any:53"
-      ]
-    },
-
-    "dns": {
-      "enable": true,
-      "respect-rules": true,
-      "ipv6": true,
-      "prefer-h3": false,
-      "enhanced-mode": "fake-ip",
-      "fake-ip-range": "198.18.0.1/16",
-
-      "default-nameserver": [
-        "223.5.5.5",
-        "119.29.29.119",
-        "2400:3200::1"
-      ],
-
-      "nameserver": [
-        "https://dns.cloudflare.com/dns-query",
-        "https://dns.google/dns-query"
-      ],
-
-      "proxy-server-nameserver-policy": null,
-
-      "proxy-server-nameserver": [
-        "https://dns.alidns.com/dns-query",
-        "https://doh.pub/dns-query"
-      ],
-
-      "direct-nameserver": [
-        "https://dns.alidns.com/dns-query",
-        "https://doh.pub/dns-query"
-      ],
-
-      "nameserver-policy": {
-        "dns.cloudflare.com": [
-          "1.1.1.1",
-          "1.0.0.1"
-        ],
-
-        "dns.google": [
-          "8.8.8.8",
-          "8.8.4.4"
-        ],
-
-        "dns.quad9.net": [
-          "9.9.9.9",
-          "149.112.112.112"
-        ],
-
-        "dns.alidns.com": [
-          "223.5.5.5",
-          "223.6.6.6"
-        ],
-
-        "doh.pub": [
-          "1.12.12.12",
-          "120.53.53.53"
-        ],
-
-        "geosite:cn": [
-          "https://dns.alidns.com/dns-query",
-          "https://doh.pub/dns-query"
-        ]
-      },
-
-      "fallback": [
-        "https://anycast.uncensoreddns.org/dns-query"
-      ],
-
-      "fallback-filter": {
-        "geoip": true,
-        "geoip-code": "CN",
-        "ipcidr": [
-          "240.0.0.0/4",
-          "127.0.0.0/8",
-          "0.0.0.0/32"
-        ]
-      },
-
-      "fake-ip-filter": [
-        "*.lan",
-        "*.local",
-        "localhost",
-        "*.msftconnecttest.com",
-        "*.msftncsi.com",
-        "*.msidentity.com",
-        "captive.apple.com",
-        "*.push.apple.com",
-        "stun.*",
-        "+.stun.*.*",
-        "+.stun.*.*.*",
-        "+.stun.*.*.*.*",
-        "+.stun.*.*.*.*.*",
-        "+.weixin.com",
-        "+.wechat.com",
-        "+.qq.com",
-        "+.tencent.com",
-        "speedtest.net"
-      ]
-    },
-
-    "profile": {
-      "store-selected": true,
-      "store-fake-ip": true
-    }
-  };
-
-  // ============================================================
-  // 节点池
-  // ============================================================
+  // Preserve client-owned networking and provider fields. Replace routing below.
+  const fixed = Object.assign({}, config);
+  // Beta channel: change only the TUN stack; retain every other Hako network setting.
+  fixed.tun = Object.assign({}, config.tun, {stack: RUNESTONE.tunStack});
+  fixed.mode = "rule";
+  fixed.profile = Object.assign({}, config.profile, {"store-selected": true});
 
   fixed.proxies = currentProxies;
   fixed["proxy-groups"] = [];
@@ -321,10 +201,12 @@ function main(config) {
     ]
   });
 
+  // Microsoft 紧跟 Copilot
+  // Copilot 保持独立，不并入 Microsoft。
   fixed["proxy-groups"].push({
-    "name": "Grok",
+    "name": "Microsoft",
     "type": "select",
-    "icon": "https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Grok.png",
+    "icon": "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Microsoft.png",
     "proxies": [
       "🖥️ All-Nodes",
       "PROXY-Gate",
@@ -332,29 +214,10 @@ function main(config) {
     ]
   });
 
-  // ============================================================
-  // Microsoft
-  //
-  // 注意：
-  // Copilot 已经有独立策略组，因此 Microsoft 的规则中
-  // 不接管 Copilot 相关域名。
-  //
-  // Microsoft 组主要用于：
-  // Microsoft Account / 登录
-  // Outlook / Hotmail / Live
-  // OneDrive
-  // Microsoft 365 / Office
-  // Teams
-  // Windows / Windows Update
-  // Microsoft Store
-  // Xbox
-  // Azure / Microsoft 服务基础设施
-  // ============================================================
-
   fixed["proxy-groups"].push({
-    "name": "Microsoft",
+    "name": "Grok",
     "type": "select",
-    "icon": "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Microsoft.png",
+    "icon": "https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Grok.png",
     "proxies": [
       "🖥️ All-Nodes",
       "PROXY-Gate",
@@ -374,11 +237,10 @@ function main(config) {
   });
 
   // Apple 紧跟 Google
-  // 注意：这里只修改普通 Apple 策略组图标。
   fixed["proxy-groups"].push({
     "name": "Apple",
     "type": "select",
-    "icon": "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple_2.png",
+    "icon": "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Apple.png",
     "proxies": [
       "🖥️ All-Nodes",
       "PROXY-Gate",
@@ -468,14 +330,7 @@ function main(config) {
   //
   // 直接读取 Hako 合并后的完整 config.proxies。
   //
-  // 只有匹配到 3 个及以上节点才生成对应地区 Auto。
-  //
-  // 少于 3 个：
-  // - 不生成 Auto
-  // - 不加入服务策略组
-  // - 不加入 APNs-Fallback
-  //
-  // 所有 Auto 组统一使用 Auto.png 图标。
+  // 没有节点的地区不会生成策略组。
   // ============================================================
 
   const regionGroups = [
@@ -483,149 +338,88 @@ function main(config) {
       key: "US",
       name: "🇺🇸 US",
       filter: /([\[]US[\]]|^US$|USA|United[ _-]?States|\bUS\b|美国|美國|🇺🇸)/i,
-      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
+      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/United_States.png"
     },
 
     {
       key: "SG",
       name: "🇸🇬 SG",
       filter: /([\[]SG[\]]|^SG$|Singapore|\bSG\b|新加坡|狮城|🇸🇬)/i,
-      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
+      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Singapore.png"
     },
 
     {
       key: "HK",
       name: "🇭🇰 HK",
       filter: /([\[]HK[\]]|^HK$|Hong[ _-]?Kong|\bHK\b|香港|🇭🇰)/i,
-      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
+      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Hong_Kong.png"
     },
 
     {
       key: "JP",
       name: "🇯🇵 JP",
       filter: /([\[]JP[\]]|^JP$|Japan|\bJP\b|日本|东京|大阪|🇯🇵)/i,
-      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
+      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Japan.png"
     },
 
     {
       key: "TW",
       name: "🇹🇼 TW",
       filter: /([\[]TW[\]]|^TW$|Taiwan|Taibei|Taipei|\bTW\b|台湾|臺灣|台北|高雄|🇹🇼)/i,
-      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
+      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Taiwan.png"
     },
 
     {
       key: "UK",
       name: "🇬🇧 UK",
       filter: /([\[]UK[\]]|^UK$|United[ _-]?Kingdom|Britain|England|\bUK\b|英国|英國|伦敦|🇬🇧)/i,
-      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
+      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/United_Kingdom.png"
     },
 
     {
       key: "DE",
       name: "🇩🇪 DE",
       filter: /([\[]DE[\]]|^DE$|Germany|Deutschland|\bDE\b|德国|德國|法兰克福|🇩🇪)/i,
-      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
+      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Germany.png"
     },
 
     {
       key: "FR",
       name: "🇫🇷 FR",
       filter: /([\[]FR[\]]|^FR$|France|\bFR\b|法国|法國|巴黎|🇫🇷)/i,
-      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
+      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/France.png"
     },
 
     {
       key: "RU",
       name: "🇷🇺 RU",
       filter: /([\[]RU[\]]|^RU$|Russia|Russian[ _-]?Federation|\bRU\b|俄罗斯|俄羅斯|莫斯科|伯力|🇷🇺)/i,
-      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
-    },
+      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Russia.png"
+    }
+  ];
 
+  regionGroups.push(
     {
-      key: "CA",
-      name: "🇨🇦 CA",
-      filter: /([\[]CA[\]]|^CA$|Canada|\bCA\b|加拿大|🇨🇦)/i,
-      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
+      key: "MY",
+      name: "🇲🇾 MY",
+      filter: /(🇲🇾|马来西亚|馬來西亞|吉隆坡|Malaysia|Kuala[ _-]?Lumpur|(?:^|[^a-z0-9])MY(?:$|[^a-z0-9])|^MY[0-9])/i,
+      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Malaysia.png"
     },
 
     {
       key: "AU",
       name: "🇦🇺 AU",
-      filter: /([\[]AU[\]]|^AU$|Australia|\bAU\b|澳大利亚|澳洲|澳大利亞|🇦🇺)/i,
-      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
+      filter: /(🇦🇺|澳大利亚|澳大利亞|澳洲|悉尼|墨尔本|墨爾本|Australia|Sydney|Melbourne|(?:^|[^a-z0-9])AU(?:$|[^a-z0-9])|^AU[0-9])/i,
+      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Australia.png"
     },
 
     {
-      key: "KR",
-      name: "🇰🇷 KR",
-      filter: /([\[]KR[\]]|^KR$|Korea|South[ _-]?Korea|\bKR\b|韩国|韓國|首尔|首爾|🇰🇷)/i,
-      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
-    },
-
-    {
-      key: "IT",
-      name: "🇮🇹 IT",
-      filter: /([\[]IT[\]]|^IT$|Italy|Italian|\bIT\b|意大利|義大利|米兰|米蘭|罗马|羅馬|🇮🇹)/i,
-      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
-    },
-
-    {
-      key: "ES",
-      name: "🇪🇸 ES",
-      filter: /([\[]ES[\]]|^ES$|Spain|Spanish|\bES\b|西班牙|马德里|馬德里|🇪🇸)/i,
-      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
-    },
-
-    {
-      key: "NL",
-      name: "🇳🇱 NL",
-      filter: /([\[]NL[\]]|^NL$|Netherlands|Dutch|\bNL\b|荷兰|荷蘭|阿姆斯特丹|🇳🇱)/i,
-      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
-    },
-
-    {
-      key: "FI",
-      name: "🇫🇮 FI",
-      filter: /([\[]FI[\]]|^FI$|Finland|Finnish|\bFI\b|芬兰|芬蘭|赫尔辛基|赫爾辛基|🇫🇮)/i,
-      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
-    },
-
-    {
-      key: "NO",
-      name: "🇳🇴 NO",
-      filter: /([\[]NO[\]]|^NO$|Norway|Norwegian|\bNO\b|挪威|奥斯陆|奧斯陸|🇳🇴)/i,
-      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
-    },
-
-    {
-      key: "SE",
-      name: "🇸🇪 SE",
-      filter: /([\[]SE[\]]|^SE$|Sweden|Swedish|\bSE\b|瑞典|斯德哥尔摩|斯德哥爾摩|🇸🇪)/i,
-      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
-    },
-
-    {
-      key: "CH",
-      name: "🇨🇭 CH",
-      filter: /([\[]CH[\]]|^CH$|Switzerland|Swiss|\bCH\b|瑞士|苏黎世|蘇黎世|日内瓦|日內瓦|🇨🇭)/i,
-      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
-    },
-
-    {
-      key: "PL",
-      name: "🇵🇱 PL",
-      filter: /([\[]PL[\]]|^PL$|Poland|Polish|\bPL\b|波兰|波蘭|华沙|華沙|🇵🇱)/i,
-      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
-    },
-
-    {
-      key: "MY",
-      name: "🇲🇾 MY",
-      filter: /([\[]MY[\]]|^MY$|Malaysia|Malaysian|\bMY\b|马来西亚|馬來西亞|吉隆坡|🇲🇾)/i,
-      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"
+      key: "IN",
+      name: "🇮🇳 IN",
+      filter: /(🇮🇳|印度|孟买|孟買|新德里|India|Mumbai|New[ _-]?Delhi|(?:^|[^a-z0-9])IN(?:$|[^a-z0-9])|^IN[0-9])/i,
+      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/India.png"
     }
-  ];
+  );
 
   const existingRegionalAutos = [];
 
@@ -636,8 +430,8 @@ function main(config) {
 
     const autoName = region.name + "-Auto";
 
-    // 只有 3 个及以上节点才生成该地区 Auto。
-    if (matched.length < 3) {
+    // 没有节点则完全不生成该地区组。
+    if (matched.length === 0) {
       return;
     }
 
@@ -651,32 +445,28 @@ function main(config) {
       tolerance: 50
     });
 
-    // 这里只记录实际生成的 Auto。
-    // 后续服务策略组和 APNs-Fallback 都只引用这个数组。
     existingRegionalAutos.push(autoName);
   });
 
   // ============================================================
   // 4. 将实际存在的 Auto 组加入服务策略组
   //
-  // 顺序固定为：
+  // 例如：
+  // 如果实际只有 US / SG / JP：
   //
-  // 🖥️ All-Nodes
-  // 🌍 Global-Fallback
-  // 🇺🇸 US-Auto
-  // 🇸🇬 SG-Auto
-  // ...
+  // YouTube:
+  // All-Nodes
+  // US-Auto
+  // SG-Auto
+  // JP-Auto
   // PROXY-Gate
   // DIRECT
   //
-  // Global-Fallback 是用户主动选择的跨地区容灾模式。
+  // Microsoft 同样自动获得实际存在的地区 Auto。
   // ============================================================
 
   const serviceProxyChoices = [
     "🖥️ All-Nodes",
-    ...(existingRegionalAutos.length
-      ? ["🌍 Global-Fallback"]
-      : []),
     ...existingRegionalAutos,
     "PROXY-Gate",
     "DIRECT"
@@ -693,8 +483,8 @@ function main(config) {
     "Gemini",
     "Claude",
     "Copilot",
-    "Grok",
     "Microsoft",
+    "Grok",
     "Google",
     "Apple",
     "X",
@@ -715,16 +505,7 @@ function main(config) {
   // ============================================================
   // 5. PROXY-Gate
   //
-  // 顺序固定为：
-  //
-  // 🖥️ All-Nodes
-  // 🌍 Global-Fallback
-  // 🇺🇸 US-Auto
-  // 🇸🇬 SG-Auto
-  // ...
-  // DIRECT
-  //
-  // Global-Fallback 同样只是一个可手动选择的出口。
+  // 同样只加入实际存在的地区 Auto。
   // ============================================================
 
   const proxyGate = fixed["proxy-groups"].find(
@@ -734,9 +515,6 @@ function main(config) {
   if (proxyGate) {
     proxyGate.proxies = [
       "🖥️ All-Nodes",
-      ...(existingRegionalAutos.length
-        ? ["🌍 Global-Fallback"]
-        : []),
       ...existingRegionalAutos,
       "DIRECT"
     ];
@@ -747,46 +525,26 @@ function main(config) {
   //
   // 只引用实际生成的地区 Auto。
   //
-  // 少于 3 个节点的地区不会出现在这里。
+  // Apple Push 本身仍然保持：
+  // Apple Push
+  //   ├─ APNs-Fallback
+  //   └─ DIRECT
+  //
+  // APNs-Fallback：
+  //   ├─ US-Auto（如果存在）
+  //   ├─ SG-Auto（如果存在）
+  //   ├─ HK-Auto（如果存在）
+  //   └─ ...
   // ============================================================
 
   fixed["proxy-groups"].push({
     name: "APNs-Fallback",
     type: "fallback",
-    proxies: existingRegionalAutos,
-    icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Available_1.png",
+    proxies: existingRegionalAutos.length ? existingRegionalAutos : currentProxyNames.slice(),
+    icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Apple.png",
     url: "http://captive.apple.com/hotspot-detect.html",
     interval: 300
   });
-
-  // ============================================================
-  // 7. Global-Fallback
-  //
-  // 放在整个策略组列表最后，与 APNs-Fallback 相邻。
-  //
-  // 它引用地区 Auto，而不是直接引用原始节点。
-  //
-  // 因此逻辑为：
-  //
-  // 地区内部：
-  //     US-Auto → 自动选择 US 地区可用节点
-  //
-  // 地区之间：
-  //     US-Auto → SG-Auto → HK-Auto → ...
-  //
-  // 只有用户主动选择 🌍 Global-Fallback 时才启用。
-  // ============================================================
-
-  if (existingRegionalAutos.length) {
-    fixed["proxy-groups"].push({
-      name: "🌍 Global-Fallback",
-      type: "fallback",
-      proxies: existingRegionalAutos,
-      icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Available_1.png",
-      url: "http://www.gstatic.com/generate_204",
-      interval: 600
-    });
-  }
 
   // ============================================================
   // Rules
@@ -947,28 +705,26 @@ function main(config) {
     "DOMAIN-SUFFIX,claudeusercontent.com,Claude",
     "DOMAIN-SUFFIX,claudeusercontent.com.cdn.cloudflare.net,Claude",
 
+    // ============================================================
     // Copilot
-    // 必须位于 Microsoft 广泛域名规则之前，
-    // 确保 Copilot 使用独立策略组。
+    //
+    // 必须位于 Microsoft 通用规则之前。
+    // ============================================================
+
     "DOMAIN-SUFFIX,copilot.microsoft.com,Copilot",
     "DOMAIN-SUFFIX,ai.microsoft.com,Copilot",
     "DOMAIN-SUFFIX,designer.microsoft.com,Copilot",
     "DOMAIN-SUFFIX,copilot.com,Copilot",
-    "DOMAIN-KEYWORD,copilot,Copilot",
 
-    // Grok
-    "DOMAIN-SUFFIX,grok.com,Grok",
-    "DOMAIN-SUFFIX,x.ai,Grok",
-    "DOMAIN-KEYWORD,grok,Grok",
-
-    // ========================================================
+    // ============================================================
     // Microsoft
     //
-    // Copilot 已经在上方优先匹配，因此这里的 Microsoft
-    // 广泛规则不会抢走 Copilot 流量。
-    // ========================================================
+    // Microsoft 独立策略组。
+    //
+    // Copilot 已在上方单独匹配，因此这里不处理 Copilot。
+    // ============================================================
 
-    // Microsoft Account / 登录
+    // Microsoft Account / Identity / Login
     "DOMAIN-SUFFIX,account.microsoft.com,Microsoft",
     "DOMAIN-SUFFIX,account.live.com,Microsoft",
     "DOMAIN-SUFFIX,login.live.com,Microsoft",
@@ -980,125 +736,121 @@ function main(config) {
     "DOMAIN-SUFFIX,msftauth.net,Microsoft",
     "DOMAIN-SUFFIX,msftauthimages.net,Microsoft",
     "DOMAIN-SUFFIX,msidentity.com,Microsoft",
-
-    // Outlook / Hotmail / Live Mail
-    "DOMAIN-SUFFIX,outlook.com,Microsoft",
-    "DOMAIN-SUFFIX,outlook.office.com,Microsoft",
-    "DOMAIN-SUFFIX,outlook.office365.com,Microsoft",
-    "DOMAIN-SUFFIX,hotmail.com,Microsoft",
-    "DOMAIN-SUFFIX,hotmail.co.uk,Microsoft",
     "DOMAIN-SUFFIX,live.com,Microsoft",
     "DOMAIN-SUFFIX,live.net,Microsoft",
-    "DOMAIN-SUFFIX,office.live.com,Microsoft",
-    "DOMAIN-SUFFIX,mail.live.com,Microsoft",
+
+    // Outlook / Hotmail / Mail
+    "DOMAIN-SUFFIX,outlook.com,Microsoft",
+    "DOMAIN-SUFFIX,outlook.live.com,Microsoft",
+    "DOMAIN-SUFFIX,outlook.office.com,Microsoft",
+    "DOMAIN-SUFFIX,hotmail.com,Microsoft",
+    "DOMAIN-SUFFIX,hotmail.co.uk,Microsoft",
+    "DOMAIN-SUFFIX,office365.com,Microsoft",
 
     // Microsoft 365 / Office
     "DOMAIN-SUFFIX,microsoft365.com,Microsoft",
+    "DOMAIN-SUFFIX,microsoft365.us,Microsoft",
     "DOMAIN-SUFFIX,office.com,Microsoft",
     "DOMAIN-SUFFIX,office.net,Microsoft",
     "DOMAIN-SUFFIX,office365.com,Microsoft",
     "DOMAIN-SUFFIX,officeapps.live.com,Microsoft",
     "DOMAIN-SUFFIX,officeclient.microsoft.com,Microsoft",
     "DOMAIN-SUFFIX,officecdn.microsoft.com,Microsoft",
-    "DOMAIN-SUFFIX,officecdn.microsoft.com.edgesuite.net,Microsoft",
     "DOMAIN-SUFFIX,msocdn.com,Microsoft",
     "DOMAIN-SUFFIX,microsoftonline.com,Microsoft",
     "DOMAIN-SUFFIX,microsoftonline-p.com,Microsoft",
     "DOMAIN-SUFFIX,microsoftonline-p.net,Microsoft",
 
-    // OneDrive / SharePoint
+    // OneDrive
     "DOMAIN-SUFFIX,onedrive.com,Microsoft",
     "DOMAIN-SUFFIX,onedrive.live.com,Microsoft",
     "DOMAIN-SUFFIX,1drv.com,Microsoft",
+    "DOMAIN-SUFFIX,onedriveusercontent.com,Microsoft",
+
+    // SharePoint
     "DOMAIN-SUFFIX,sharepoint.com,Microsoft",
     "DOMAIN-SUFFIX,sharepointonline.com,Microsoft",
-    "DOMAIN-SUFFIX,sharepointonline.com.edgesuite.net,Microsoft",
 
     // Microsoft Teams
     "DOMAIN-SUFFIX,teams.microsoft.com,Microsoft",
     "DOMAIN-SUFFIX,teams.live.com,Microsoft",
-    "DOMAIN-SUFFIX,teams.events.data.microsoft.com,Microsoft",
-    "DOMAIN-SUFFIX,teams.microsoft.net,Microsoft",
+    "DOMAIN-SUFFIX,teams.cloud.microsoft,Microsoft",
     "DOMAIN-SUFFIX,skype.com,Microsoft",
-    "DOMAIN-SUFFIX,skypeforbusiness.com,Microsoft",
+    "DOMAIN-SUFFIX,skypeassets.com,Microsoft",
 
     // Microsoft Store
-    "DOMAIN-SUFFIX,microsoftstore.com,Microsoft",
     "DOMAIN-SUFFIX,microsoft.com,Microsoft",
-    "DOMAIN-SUFFIX,store.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,microsoftstore.com,Microsoft",
+    "DOMAIN-SUFFIX,apps.microsoft.com,Microsoft",
     "DOMAIN-SUFFIX,storeedgefd.dsx.mp.microsoft.com,Microsoft",
     "DOMAIN-SUFFIX,displaycatalog.mp.microsoft.com,Microsoft",
-    "DOMAIN-SUFFIX,dl.delivery.mp.microsoft.com,Microsoft",
-    "DOMAIN-SUFFIX,delivery.mp.microsoft.com,Microsoft",
 
     // Windows / Windows Update
     "DOMAIN-SUFFIX,windows.com,Microsoft",
     "DOMAIN-SUFFIX,windows.net,Microsoft",
     "DOMAIN-SUFFIX,windowsupdate.com,Microsoft",
-    "DOMAIN-SUFFIX,windowsupdate.microsoft.com,Microsoft",
     "DOMAIN-SUFFIX,update.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,windowsupdate.microsoft.com,Microsoft",
     "DOMAIN-SUFFIX,download.windowsupdate.com,Microsoft",
     "DOMAIN-SUFFIX,delivery.mp.microsoft.com,Microsoft",
-    "DOMAIN-SUFFIX,download.microsoft.com,Microsoft",
-    "DOMAIN-SUFFIX,download.windows.com,Microsoft",
-    "DOMAIN-SUFFIX,msftconnecttest.com,Microsoft",
-    "DOMAIN-SUFFIX,msftncsi.com,Microsoft",
+    "DOMAIN-SUFFIX,dl.delivery.mp.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,ctldl.windowsupdate.com,Microsoft",
+    "DOMAIN-SUFFIX,emdl.ws.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,do.dsp.mp.microsoft.com,Microsoft",
 
-    // Microsoft 服务基础设施
-    "DOMAIN-SUFFIX,azure.com,Microsoft",
-    "DOMAIN-SUFFIX,azure.net,Microsoft",
+    // Microsoft Services / CDN
     "DOMAIN-SUFFIX,azureedge.net,Microsoft",
     "DOMAIN-SUFFIX,azurefd.net,Microsoft",
-    "DOMAIN-SUFFIX,azurewebsites.net,Microsoft",
-    "DOMAIN-SUFFIX,trafficmanager.net,Microsoft",
-    "DOMAIN-SUFFIX,msedge.net,Microsoft",
     "DOMAIN-SUFFIX,msft.net,Microsoft",
-    "DOMAIN-SUFFIX,msftstatic.com,Microsoft",
+    "DOMAIN-SUFFIX,msftncsi.com,Microsoft",
+    "DOMAIN-SUFFIX,msftconnecttest.com,Microsoft",
     "DOMAIN-SUFFIX,msecnd.net,Microsoft",
+    "DOMAIN-SUFFIX,edgesuite.net,Microsoft",
 
-    // Microsoft Telemetry / 服务 API
-    "DOMAIN-SUFFIX,data.microsoft.com,Microsoft",
-    "DOMAIN-SUFFIX,events.data.microsoft.com,Microsoft",
-    "DOMAIN-SUFFIX,settings-win.data.microsoft.com,Microsoft",
-    "DOMAIN-SUFFIX,v10.events.data.microsoft.com,Microsoft",
-    "DOMAIN-SUFFIX,watson.microsoft.com,Microsoft",
-    "DOMAIN-SUFFIX,watson.telemetry.microsoft.com,Microsoft",
-    "DOMAIN-SUFFIX,telemetry.microsoft.com,Microsoft",
+    // Azure
+    "DOMAIN-SUFFIX,azure.com,Microsoft",
+    "DOMAIN-SUFFIX,azure.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,azurewebsites.net,Microsoft",
+    "DOMAIN-SUFFIX,cloudapp.azure.com,Microsoft",
+    "DOMAIN-SUFFIX,management.azure.com,Microsoft",
+    "DOMAIN-SUFFIX,portal.azure.com,Microsoft",
+    "DOMAIN-SUFFIX,graph.microsoft.com,Microsoft",
+
+    // Microsoft Graph / APIs
+    "DOMAIN-SUFFIX,graph.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,graph.windows.net,Microsoft",
+    "DOMAIN-SUFFIX,api.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,apis.microsoft.com,Microsoft",
 
     // Xbox
     "DOMAIN-SUFFIX,xbox.com,Microsoft",
     "DOMAIN-SUFFIX,xboxlive.com,Microsoft",
     "DOMAIN-SUFFIX,xboxlive.net,Microsoft",
-    "DOMAIN-SUFFIX,xboxservices.com,Microsoft",
-    "DOMAIN-SUFFIX,xboxab.com,Microsoft",
+    "DOMAIN-SUFFIX,gamepass.com,Microsoft",
 
-    // Visual Studio / Developer 服务
+    // Visual Studio / Developer
     "DOMAIN-SUFFIX,visualstudio.com,Microsoft",
     "DOMAIN-SUFFIX,visualstudio.microsoft.com,Microsoft",
     "DOMAIN-SUFFIX,vsassets.io,Microsoft",
-    "DOMAIN-SUFFIX,vsblob.vsassets.io,Microsoft",
+    "DOMAIN-SUFFIX,nuget.org,Microsoft",
 
     // Bing
     "DOMAIN-SUFFIX,bing.com,Microsoft",
     "DOMAIN-SUFFIX,bing.net,Microsoft",
-    "DOMAIN-SUFFIX,bingapis.com,Microsoft",
-    "DOMAIN-SUFFIX,bingusercontent.com,Microsoft",
 
-    // Microsoft CDN / 静态资源
-    "DOMAIN-SUFFIX,akamaized.net,Microsoft",
-    "DOMAIN-SUFFIX,microsoft.com.akamaized.net,Microsoft",
+    // Microsoft telemetry / diagnostics
+    "DOMAIN-SUFFIX,events.data.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,v10.events.data.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,v20.events.data.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,settings-win.data.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,watson.microsoft.com,Microsoft",
+    "DOMAIN-SUFFIX,watson.telemetry.microsoft.com,Microsoft",
 
-    // Microsoft 通用关键词
-    "DOMAIN-KEYWORD,microsoft,Microsoft",
-    "DOMAIN-KEYWORD,windows,Microsoft",
-    "DOMAIN-KEYWORD,office365,Microsoft",
-    "DOMAIN-KEYWORD,onedrive,Microsoft",
-    "DOMAIN-KEYWORD,outlook,Microsoft",
-    "DOMAIN-KEYWORD,hotmail,Microsoft",
-    "DOMAIN-KEYWORD,xbox,Microsoft",
+    // Grok
+    "DOMAIN-SUFFIX,grok.com,Grok",
+    "DOMAIN-SUFFIX,x.ai,Grok",
 
     // Google
-    "DOMAIN-KEYWORD,google,Google",
     "DOMAIN-SUFFIX,gmail.com,Google",
     "DOMAIN-SUFFIX,googleusercontent.com,Google",
     "DOMAIN-SUFFIX,gstatic.com,Google",
@@ -1269,6 +1021,189 @@ function main(config) {
       "url": "https://raw.githubusercontent.com/kiki-rgb-00/kiki/refs/heads/main/MRS/ChinaMax_IP.mrs"
     }
   };
+
+  // All project-owned MRS resources follow one configurable repository.
+  Object.values(fixed["rule-providers"]).forEach(provider => {
+    provider.url = provider.url.replace(
+      /^https:\/\/raw\.githubusercontent\.com\/[^/]+\/[^/]+\/(?:refs\/heads\/)?main\/MRS\//,
+      "https://raw.githubusercontent.com/" + RUNESTONE.repository + "/main/MRS/"
+    );
+  });
+
+  fixed.rules = [...new Set(fixed.rules)];
+
+  const added = ["Pixiv", "LinkedIn", "Threads"];
+
+  added.forEach(name => {
+    fixed["rule-providers"][name + "_Domain"] = {
+      type: "http",
+      behavior: "domain",
+      format: "mrs",
+      interval: 86400,
+      url:
+        "https://raw.githubusercontent.com/" +
+        RUNESTONE.repository +
+        "/main/MRS/" +
+        name +
+        "_Domain.mrs"
+    };
+  });
+
+  const choices = [
+    "🇯🇵 JP-Auto",
+    "🇸🇬 SG-Auto",
+    ...existingRegionalAutos,
+    "🖥️ All-Nodes"
+  ];
+
+  const serviceIcons = {
+    Pixiv: "https://www.google.com/s2/favicons?domain=www.pixiv.net&sz=128",
+    LinkedIn: "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/linkedin.png",
+    Threads: "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/threads.png"
+  };
+
+  const addedGroups = added.map(name => ({
+    name,
+    type: "select",
+    icon: serviceIcons[name],
+    proxies: [...new Set(choices)].filter(n =>
+      n === "🖥️ All-Nodes" || existingRegionalAutos.includes(n)
+    )
+  }));
+
+  const afterSpeedtest =
+    fixed["proxy-groups"].findIndex(g => g.name === "Speedtest") + 1;
+
+  fixed["proxy-groups"].splice(
+    afterSpeedtest,
+    0,
+    ...addedGroups
+  );
+
+  const beforeServices =
+    fixed.rules.findIndex(
+      r => r === "DOMAIN-SUFFIX,youtube.com,YouTube"
+    );
+
+  fixed.rules.splice(
+    beforeServices,
+    0,
+    ...added.map(
+      name => "RULE-SET," + name + "_Domain," + name
+    )
+  );
+
+  const groups = fixed["proxy-groups"];
+  const available = new Set(groups.map(g => g.name));
+
+  const regions = {
+    JP: "🇯🇵 JP",
+    SG: "🇸🇬 SG",
+    HK: "🇭🇰 HK",
+    TW: "🇹🇼 TW",
+    US: "🇺🇸 US",
+    UK: "🇬🇧 UK",
+    MY: "🇲🇾 MY",
+    AU: "🇦🇺 AU",
+    IN: "🇮🇳 IN"
+  };
+
+  const order = {
+    "PROXY-Gate": ["SG", "JP", "HK"],
+    YouTube: ["JP", "MY", "TW", "SG", "US"],
+    Spotify: ["MY", "IN", "JP", "US"],
+    GPT: ["JP", "SG", "TW", "US"],
+    Claude: ["JP", "SG", "TW", "US"],
+    Gemini: ["JP", "SG", "TW", "US"],
+    Google: ["JP", "SG", "HK"],
+    Github: ["JP", "SG", "HK", "US"],
+    X: ["JP", "TW", "SG"],
+    Pixiv: ["JP", "TW", "SG"],
+    Facebook: ["SG", "JP", "US"],
+    Instagram: ["SG", "JP", "US"],
+    Threads: ["SG", "JP", "US"],
+    WhatsApp: ["SG", "JP", "HK"],
+    Telegram: ["SG", "JP", "HK"],
+    LinkedIn: ["SG", "US", "UK"]
+  };
+
+  if (RUNESTONE.personal) {
+    groups.forEach(group => {
+      if (order[group.name]) {
+        const preferred = order[group.name]
+          .map(k => regions[k] + "-Auto")
+          .filter(n => available.has(n));
+
+        group.proxies = [
+          ...new Set([
+            ...preferred,
+            ...group.proxies
+          ])
+        ];
+      }
+
+      if (group.name === "Apple") {
+        group.proxies = [
+          "DIRECT",
+          ...group.proxies.filter(n => n !== "DIRECT")
+        ];
+      }
+
+      if (group.name === "Apple Push") {
+        group.proxies = [
+          "DIRECT",
+          "APNs-Fallback"
+        ];
+      }
+    });
+  }
+
+  // Never silently shadow a node with a generated group or built-in outbound.
+  const reserved = new Set([
+    "DIRECT",
+    "REJECT",
+    "REJECT-DROP",
+    "PASS",
+    "PASS-RULE",
+    "COMPATIBLE",
+    ...groups.map(g => g.name)
+  ]);
+
+  if (currentProxyNames.some(name => reserved.has(name))) {
+    throw new Error(
+      "Runestone: node name conflicts with a generated group or built-in outbound"
+    );
+  }
+
+  if (
+    groups.some(g =>
+      Object.prototype.hasOwnProperty.call(
+        config["proxy-providers"] || {},
+        g.name
+      )
+    )
+  ) {
+    throw new Error(
+      "Runestone: provider name conflicts with a generated group"
+    );
+  }
+
+  const knownOutbounds = new Set([
+    ...reserved,
+    ...currentProxyNames
+  ]);
+
+  if (
+    currentProxies.some(
+      p =>
+        p["dialer-proxy"] &&
+        !knownOutbounds.has(p["dialer-proxy"])
+    )
+  ) {
+    throw new Error(
+      "Runestone: dialer-proxy references a source group that routing replacement would remove"
+    );
+  }
 
   return fixed;
 }

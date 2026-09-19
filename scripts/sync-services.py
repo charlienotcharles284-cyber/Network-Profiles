@@ -240,7 +240,6 @@ def main():
                     f"{type(exc).__name__}: {exc}"
                 )
 
-                # Continue with the remaining services.
                 continue
 
     print("")

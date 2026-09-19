@@ -2,7 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
-const files = ['JS/Runestone_V3.js', 'JS/Runestone_Charlie.js'].filter(fs.existsSync);
+const files = ['JS/Runestone_V3.js', 'JS/Runestone_Charlie.js', 'JS/Runestone_Charlie_Beta.js'].filter(fs.existsSync);
 const nodes = names => names.map(name => ({name, type:'ss',server:'example.invalid',port:443,cipher:'aes-128-gcm',password:'test-only'}));
 function run(file, config) {
  const sandbox = {input:config};
@@ -44,7 +44,12 @@ for(const file of files){
   const config={proxies:nodes(['日本 01','新加坡 01','马来西亚 01','澳洲 01','印度 01','unknown']),dns:{enable:true,nameserver:['1.1.1.1']},tun:{enable:false},'mixed-port':8888,'proxy-providers':{source:{type:'inline',payload:[]}},profile:{'store-fake-ip':false},rules:['MATCH,DIRECT']};
   const original=JSON.stringify(config); const c=run(file,config); validate(c);
   assert.equal(JSON.stringify(config),original);
-  for(const key of ['proxies','dns','tun','mixed-port','proxy-providers']) assert.deepEqual(c[key],config[key]);
+  for(const key of ['proxies','dns','mixed-port','proxy-providers']) assert.deepEqual(c[key],config[key]);
+  if (file.endsWith('_Beta.js')) {
+   assert.deepEqual(c.tun,{...config.tun,stack:'mips'});
+  } else {
+   assert.deepEqual(c.tun,config.tun);
+  }
   assert.deepEqual(run(file,c),c); assert.deepEqual(run(file,config),c);
  });
  test(file+' empty, provider-only, invalid and duplicate nodes fail clearly',()=>{
@@ -67,6 +72,8 @@ for(const file of files){
    assert.equal(c['rule-providers'][name + '_Domain'].behavior, 'domain');
   }
   assert.ok(!c.rules.some(r=>/DOMAIN-KEYWORD,(google|copilot|grok),/.test(r)));
+  assert.ok(c['proxy-groups'].some(g=>g.name==='Microsoft'));
+  assert.ok(c.rules.includes('DOMAIN-SUFFIX,microsoft.com,Microsoft'));
  });
 }
 if(files.includes('JS/Runestone_Charlie.js')) test('personal Auto preferences and fork-only MRS',()=>{
@@ -77,5 +84,17 @@ if(files.includes('JS/Runestone_Charlie.js')) test('personal Auto preferences an
  assert.equal(group('Spotify').proxies[0],'🇲🇾 MY-Auto');
  assert.equal(group('Apple').proxies[0],'DIRECT');
  for(const n of ['Facebook','Instagram','Threads']) assert.equal(group(n).proxies[0],'🇸🇬 SG-Auto');
- for(const p of Object.values(c['rule-providers']).filter(p=>p.url.includes('/Network-Profiles/'))) assert.ok(p.url.includes('charlienotcharles284-cyber/Network-Profiles'));
+ for(const p of Object.values(c['rule-providers']).filter(p=>p.url.includes('/MRS/'))) assert.ok(p.url.includes('charlienotcharles284-cyber/Network-Profiles'));
+});
+if(files.includes('JS/Runestone_Charlie_Beta.js')) test('beta changes only the TUN stack to MIPS',()=>{
+ const config={proxies:nodes(['日本']),tun:{enable:true,'auto-route':true,'strict-route':false},dns:{enable:true,nameserver:['1.1.1.1']}};
+ const stable=run('JS/Runestone_Charlie.js',config);
+ const beta=run('JS/Runestone_Charlie_Beta.js',config);
+ assert.equal(beta.tun.stack,'mips');
+ assert.equal(beta.tun.enable,true);
+ assert.equal(beta.tun['auto-route'],true);
+ assert.equal(beta.tun['strict-route'],false);
+ assert.deepEqual(beta.dns,stable.dns);
+ assert.deepEqual(beta['proxy-groups'],stable['proxy-groups']);
+ assert.deepEqual(beta.rules,stable.rules);
 });

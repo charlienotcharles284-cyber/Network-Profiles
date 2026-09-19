@@ -29,9 +29,9 @@ URL 导入保存的是脚本文本快照。更新 JS 后需要重新导入；rul
 
 ## 验证与限制
 
-2026-09-15：Node.js 行为测试通过；个人版本在 macOS JavaScriptCore（JXA）中执行成功。这不是 Hako 签名应用的完整运行测试。
+2026-09-19：Node.js 行为测试覆盖通用 V3、个人稳定版和 MIPS Beta；个人稳定版在 macOS JavaScriptCore（JXA）中的既有执行结果仍有效。这不是 Hako 签名应用的完整运行测试。
 
-检查了 Hako-Client 的 ScriptEngine/ScriptLibrary，以及 Hako 的 outboundgroup/parser.go、bind/hako/mrs_validation.go、config_pipeline.go。Hako 基于 Mihomo v1.19.30；Apple 层还有独立资源和配置校验，不能用普通 Mihomo 语法通过代替 Hako 实测。
+公开的 Hako/Hako-Client 源码仍停留在 Mihomo v1.19.30 时期；App Store/TestFlight 公告已进入 1.19.31。商店构建与公开源码存在时间差，因此以 App 内实际版本和真机测试为准。Apple 层还有独立资源和配置校验，不能用普通 Mihomo 语法通过代替 Hako 实测。
 
 真实订阅验收项目：节点合并、规则下载、配置启动、国内直连、目标服务命中、Telegram/WhatsApp 通话、Apple 推送、休眠唤醒和更新后恢复。未运行这些项目，不宣称能绕过服务地区限制或保证节点解锁。
 
@@ -49,7 +49,7 @@ URL 导入保存的是脚本文本快照。更新 JS 后需要重新导入；rul
 来源：
 - https://github.com/TokenPLS/Hako-Client
 - https://github.com/TokenPLS/Hako
-- https://github.com/Sydney-Moses/Network-Profiles
+- https://github.com/kiki-rgb-00/kiki
 - https://github.com/blackmatrix7/ios_rule_script
 
 ## Pixiv / LinkedIn / Threads 每日更新
@@ -65,4 +65,4 @@ URL 导入保存的是脚本文本快照。更新 JS 后需要重新导入；rul
 - 分组、图标、地区默认顺序和其他写在 JS 中的服务域名仍需重新导入 JS 更新。
 - Pixiv 上游还包括 Booth、Fanbox 等关联域名；LinkedIn 上游也含地区域名及服务资源，范围比旧版手写列表更完整。
 
-维护命令：`python scripts/sync-services.py --mihomo /path/to/mihomo`（依赖 PyYAML 6.0.2 和 Mihomo v1.19.30）。
+维护命令：`python scripts/sync-services.py --mihomo /path/to/mihomo`（依赖 PyYAML 6.0.2；正式 Action 当前固定 Mihomo v1.19.30 转换器，升级前需比较输出）。
