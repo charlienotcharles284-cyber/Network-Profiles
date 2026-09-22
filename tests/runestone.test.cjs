@@ -74,6 +74,9 @@ for(const file of files){
   assert.ok(!c.rules.some(r=>/DOMAIN-KEYWORD,(google|copilot|grok),/.test(r)));
   assert.ok(c['proxy-groups'].some(g=>g.name==='Microsoft'));
   assert.ok(c.rules.includes('DOMAIN-SUFFIX,microsoft.com,Microsoft'));
+  assert.ok(c['proxy-groups'].some(g=>g.name==='Amazon'));
+  assert.ok(c.rules.includes('DOMAIN-SUFFIX,amazon.com,Amazon'));
+  assert.ok(!c.rules.some(r=>r.includes('amazonaws.com')));
  });
 }
 if(files.includes('JS/Runestone_Charlie.js')) test('personal Auto preferences and fork-only MRS',()=>{
@@ -83,6 +86,7 @@ if(files.includes('JS/Runestone_Charlie.js')) test('personal Auto preferences an
  assert.equal(group('YouTube').proxies[0],'🇯🇵 JP-Auto');
  assert.equal(group('Spotify').proxies[0],'🇲🇾 MY-Auto');
  assert.equal(group('Apple').proxies[0],'DIRECT');
+ assert.equal(group('Amazon').proxies[0],'🖥️ All-Nodes');
  for(const n of ['Facebook','Instagram','Threads']) assert.equal(group(n).proxies[0],'🇸🇬 SG-Auto');
  for(const p of Object.values(c['rule-providers']).filter(p=>p.url.includes('/MRS/'))) assert.ok(p.url.includes('charlienotcharles284-cyber/Network-Profiles'));
 });
@@ -97,4 +101,22 @@ if(files.includes('JS/Runestone_Charlie_Beta.js')) test('beta changes only the T
  assert.deepEqual(beta.dns,stable.dns);
  assert.deepEqual(beta['proxy-groups'],stable['proxy-groups']);
  assert.deepEqual(beta.rules,stable.rules);
+});
+test('V2 uses MIPS and includes the scoped Amazon service group',()=>{
+ const c=run('JS/Runestone_V2.js',{proxies:nodes(['日本 1','日本 2','日本 3'])});
+ assert.equal(c.tun.stack,'mips');
+ assert.ok(c['proxy-groups'].some(g=>g.name==='Amazon'));
+ assert.ok(c.rules.includes('DOMAIN-SUFFIX,amazon.com,Amazon'));
+ assert.ok(!c.rules.some(r=>r.includes('amazonaws.com')));
+});
+test('V1 uses MIPS with the full Advertising rule pair',()=>{
+ const c=run('JS/Runestone_V1.js',{proxies:nodes(['日本 1','日本 2','日本 3'])});
+ assert.equal(c.tun.stack,'mips');
+ assert.ok(c.rules.includes('RULE-SET,Advertising,REJECT'));
+ assert.ok(c.rules.includes('RULE-SET,Advertising_Domain,REJECT'));
+ assert.ok(!c.rules.some(r=>r.includes('AdvertisingLite')));
+});
+test('rule workflow removes the known alicdn.com AdvertisingLite false positive',()=>{
+ const workflow=fs.readFileSync('.github/workflows/update-rules-mrs.yml','utf8');
+ assert.match(workflow,/sed -i '\/alicdn\\\.com\/d' AdvertisingLite_Domain\.yaml/);
 });

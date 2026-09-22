@@ -41,7 +41,7 @@ function main(config) {
 
     "tun": {
       "enable": true,
-      "stack": "gvisor",
+      "stack": "mips",
       "auto-route": true,
       "auto-detect-interface": true,
       "strict-route": true,
@@ -386,6 +386,18 @@ function main(config) {
     ]
   });
 
+  // Amazon 紧跟 Apple
+  fixed["proxy-groups"].push({
+    "name": "Amazon",
+    "type": "select",
+    "icon": "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Amazon.png",
+    "proxies": [
+      "🖥️ All-Nodes",
+      "PROXY-Gate",
+      "DIRECT"
+    ]
+  });
+
   fixed["proxy-groups"].push({
     "name": "X",
     "type": "select",
@@ -697,6 +709,7 @@ function main(config) {
     "Microsoft",
     "Google",
     "Apple",
+    "Amazon",
     "X",
     "Facebook",
     "Instagram",
@@ -818,6 +831,47 @@ function main(config) {
     // 普通 Apple 流量进入 Apple 策略组
     "RULE-SET,Apple,Apple",
     "RULE-SET,Apple_Domain,Apple",
+
+    // ========================================================
+    // Amazon
+    //
+    // 国际 Amazon 站点及其常用资源域名。
+    // 不将 amazonaws.com 整体纳入 Amazon，
+    // 避免接管与 Amazon 商城无关的 AWS 流量。
+    // ========================================================
+
+    "DOMAIN-SUFFIX,amazon.com,Amazon",
+    "DOMAIN-SUFFIX,amazon.co.uk,Amazon",
+    "DOMAIN-SUFFIX,amazon.de,Amazon",
+    "DOMAIN-SUFFIX,amazon.fr,Amazon",
+    "DOMAIN-SUFFIX,amazon.it,Amazon",
+    "DOMAIN-SUFFIX,amazon.es,Amazon",
+    "DOMAIN-SUFFIX,amazon.co.jp,Amazon",
+    "DOMAIN-SUFFIX,amazon.ca,Amazon",
+    "DOMAIN-SUFFIX,amazon.com.au,Amazon",
+    "DOMAIN-SUFFIX,amazon.in,Amazon",
+    "DOMAIN-SUFFIX,amazon.com.mx,Amazon",
+    "DOMAIN-SUFFIX,amazon.com.br,Amazon",
+    "DOMAIN-SUFFIX,amazon.nl,Amazon",
+    "DOMAIN-SUFFIX,amazon.pl,Amazon",
+    "DOMAIN-SUFFIX,amazon.se,Amazon",
+    "DOMAIN-SUFFIX,amazon.sg,Amazon",
+    "DOMAIN-SUFFIX,amazon.ae,Amazon",
+    "DOMAIN-SUFFIX,amazon.sa,Amazon",
+    "DOMAIN-SUFFIX,amazon.com.tr,Amazon",
+    "DOMAIN-SUFFIX,amazon.eg,Amazon",
+    "DOMAIN-SUFFIX,amazon.co.za,Amazon",
+
+    // Amazon 常用内容 / 静态资源
+    "DOMAIN-SUFFIX,images-amazon.com,Amazon",
+    "DOMAIN-SUFFIX,ssl-images-amazon.com,Amazon",
+    "DOMAIN-SUFFIX,media-amazon.com,Amazon",
+    "DOMAIN-SUFFIX,amazon-adsystem.com,Amazon",
+
+    // Amazon Pay
+    "DOMAIN-SUFFIX,amazonpay.com,Amazon",
+    "DOMAIN-SUFFIX,amazonpay.in,Amazon",
+    "DOMAIN-SUFFIX,amazonpay.com.br,Amazon",
 
     // 广告 / 隐私
     "RULE-SET,AdvertisingLite,REJECT",

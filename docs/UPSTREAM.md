@@ -6,6 +6,7 @@
 - 旧上游：`https://github.com/Sydney-Moses/Network-Profiles.git`
 - 本 Fork：`https://github.com/charlienotcharles284-cyber/Network-Profiles.git`
 - 首次迁移基线：`kiki/main@408cf598dfdbc38dc37f293c8842f66e47ab6aca`
+- 最近同步基线：`kiki/main@f81fa72cf2604da91aed111133dd03ce5ecefcb5`
 
 新仓库使用独立 Git 历史，因此不把它与旧 Fork 强行合并。同步时只审查并引入需要的文件，保留本 Fork 的个人脚本、测试、文档和远程规则地址。
 

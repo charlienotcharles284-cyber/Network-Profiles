@@ -17,6 +17,7 @@ https://raw.githubusercontent.com/charlienotcharles284-cyber/Network-Profiles/ma
 | ChatGPT / Claude / Gemini / Google（含 Gmail） | 日本 Auto |
 | Spotify | 马来西亚 Auto 优先；首次导入务必按账号实际地区选择 |
 | Apple / Apple Push | DIRECT 优先，Push 保留代理回退 |
+| Amazon | 不预设国家；首次导入按商城与账号地区选择 |
 
 以上只从实际存在的组中选择；不存在首选地区时按备选排序。已有客户端记忆选择可能覆盖新的排序，升级后检查一次。Auto 会根据测速在同一地区内选择节点。
 
@@ -24,7 +25,9 @@ https://raw.githubusercontent.com/charlienotcharles284-cyber/Network-Profiles/ma
 
 AI 组保留手动选择其他出口的能力；排序不代表服务地区资格保证。Spotify 默认马来西亚只是历史偏好预设，不会修改账号地区、付款地区或会员资格。YouTube 默认日本，若需要匹配现有会员地区请手动调整。
 
-V1/V2 作为完整网络配置的回退入口。V3 通用版、个人稳定版和 Beta 统一由构建脚本生成：
+Amazon 规则覆盖主要国际商城、静态资源和 Amazon Pay，不包含整个 `amazonaws.com`，避免将普通 AWS 服务误分到商城策略组。
+
+V1/V2 作为完整网络配置入口。当前 V2 已由上游改为 MIPS；V1 使用完整 Advertising 规则，拦截强度高于 Stable/V2 使用的 AdvertisingLite 组合。V3 通用版、个人稳定版和 Beta 统一由构建脚本生成：
 
 ```
 node scripts/build-personal.cjs

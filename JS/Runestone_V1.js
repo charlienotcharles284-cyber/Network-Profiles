@@ -820,10 +820,8 @@ function main(config) {
     "RULE-SET,Apple_Domain,Apple",
 
     // 广告 / 隐私
-    "RULE-SET,AdvertisingLite,REJECT",
-    "RULE-SET,AdvertisingLite_Domain,REJECT",
-    "RULE-SET,Privacy,REJECT",
-    "RULE-SET,Privacy_Domain,REJECT",
+    "RULE-SET,Advertising,REJECT",
+    "RULE-SET,Advertising_Domain,REJECT",
     "RULE-SET,ACL4SSR_BanAD,REJECT",
     "RULE-SET,ACL4SSR_BanProgramAD,REJECT",
 
@@ -1197,36 +1195,20 @@ function main(config) {
       "url": "https://raw.githubusercontent.com/kiki-rgb-00/kiki/refs/heads/main/MRS/Apple_Domain.mrs"
     },
 
-    "AdvertisingLite": {
+    "Advertising": {
       "type": "http",
       "behavior": "classical",
       "format": "yaml",
       "interval": 86400,
-      "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/AdvertisingLite/AdvertisingLite.yaml"
+      "url": "https://raw.githubusercontent.com/kiki-rgb-00/kiki/refs/heads/main/Rules/Advertising.yaml"
     },
 
-    "AdvertisingLite_Domain": {
+    "Advertising_Domain": {
       "type": "http",
       "behavior": "domain",
       "format": "mrs",
       "interval": 86400,
-      "url": "https://raw.githubusercontent.com/kiki-rgb-00/kiki/refs/heads/main/MRS/AdvertisingLite_Domain.mrs"
-    },
-
-    "Privacy": {
-      "type": "http",
-      "behavior": "classical",
-      "format": "yaml",
-      "interval": 86400,
-      "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/Privacy/Privacy.yaml"
-    },
-
-    "Privacy_Domain": {
-      "type": "http",
-      "behavior": "domain",
-      "format": "mrs",
-      "interval": 86400,
-      "url": "https://raw.githubusercontent.com/kiki-rgb-00/kiki/refs/heads/main/MRS/Privacy_Domain.mrs"
+      "url": "https://raw.githubusercontent.com/kiki-rgb-00/kiki/refs/heads/main/MRS/Advertising_Domain.mrs"
     },
 
     "ACL4SSR_BanAD": {

@@ -18,6 +18,7 @@ URL 导入保存的是脚本文本快照。更新 JS 后需要重新导入；rul
 - 新增马来西亚、澳洲、印度；没有对应节点不生成该地区组。
 - 每个识别地区只生成 Auto（测速）组；不生成 Manual 或 Meta-Region。
 - 补齐 Pixiv、LinkedIn、Threads 的核心域名；三个服务组紧接 Speedtest 排列，位于地区组之前。这些不是完整域名全集。
+- 增加 Amazon 国际商城策略组；覆盖主要商城与 Amazon Pay，不接管整个 `amazonaws.com`。
 - 无节点、非法节点对象、重名、provider/组冲突、指向被移除组的 dialer-proxy 会报错。
 - 未识别地区的节点保留在 All-Nodes；APNs-Fallback 在没有地区组时使用这些节点，避免空组。
 - 保留输入的 DNS、TUN、端口、节点对象、proxy-providers 等字段；替换 proxy-groups、rules、rule-providers，设置 rule 模式及 store-selected。
